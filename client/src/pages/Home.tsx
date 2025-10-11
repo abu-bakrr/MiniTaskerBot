@@ -51,6 +51,8 @@ interface HomeProps {
   favoritesCount: number;
   onAddToCart: (id: string) => void;
   onToggleFavorite: (id: string) => void;
+  favoriteIds: string[];
+  cartItemIds: string[];
 }
 
 export default function Home({
@@ -61,6 +63,8 @@ export default function Home({
   favoritesCount,
   onAddToCart,
   onToggleFavorite,
+  favoriteIds,
+  cartItemIds,
 }: HomeProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -136,6 +140,9 @@ export default function Home({
         onToggleFavorite={onToggleFavorite}
         onAddToCart={onAddToCart}
         onProductClick={onProductClick}
+        favoriteIds={favoriteIds}
+        cartItemIds={cartItemIds}
+        onCartClick={onCartClick}
       />
 
       <Pagination

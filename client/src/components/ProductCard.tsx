@@ -1,6 +1,5 @@
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 
 interface ProductCardProps {
   id: string;
@@ -8,9 +7,11 @@ interface ProductCardProps {
   price: number;
   image: string;
   isFavorite?: boolean;
+  isInCart?: boolean;
   onToggleFavorite?: (id: string) => void;
   onAddToCart?: (id: string) => void;
   onClick?: (id: string) => void;
+  onCartClick?: () => void;
 }
 
 export default function ProductCard({
@@ -19,21 +20,24 @@ export default function ProductCard({
   price,
   image,
   isFavorite = false,
+  isInCart = false,
   onToggleFavorite,
   onAddToCart,
   onClick,
+  onCartClick,
 }: ProductCardProps) {
-  const [favorite, setFavorite] = useState(isFavorite);
-
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setFavorite(!favorite);
     onToggleFavorite?.(id);
   };
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleCartClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onAddToCart?.(id);
+    if (isInCart) {
+      onCartClick?.();
+    } else {
+      onAddToCart?.(id);
+    }
   };
 
   return (
@@ -55,7 +59,7 @@ export default function ProductCard({
           data-testid={`button-favorite-${id}`}
         >
           <Heart
-            className={`w-5 h-5 ${favorite ? "fill-primary text-primary" : "text-foreground"}`}
+            className={`w-5 h-5 ${isFavorite ? "fill-red-500 text-red-500" : "text-foreground"}`}
           />
         </button>
       </div>
@@ -70,12 +74,16 @@ export default function ProductCard({
           </p>
           <Button
             size="icon"
-            variant="ghost"
-            onClick={handleAddToCart}
+            variant={isInCart ? "default" : "ghost"}
+            onClick={handleCartClick}
             className="h-8 w-8"
             data-testid={`button-add-to-cart-${id}`}
           >
-            <ShoppingCart className="w-4 h-4" />
+            {isInCart ? (
+              <Check className="w-4 h-4" />
+            ) : (
+              <ShoppingCart className="w-4 h-4" />
+            )}
           </Button>
         </div>
       </div>
