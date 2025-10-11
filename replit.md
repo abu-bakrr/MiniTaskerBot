@@ -4,6 +4,15 @@
 
 Flowery Bloom is a mobile-first Telegram Mini App for an online flower shop. The application features a clean, pastel-themed interface designed exclusively for mobile devices (max 420px width). Built with React and Express, it provides an e-commerce experience for browsing and purchasing flowers and greeting cards with a focus on simplicity and aesthetic appeal.
 
+## Recent Changes (October 11, 2025)
+
+- **Database Categories**: Migrated category data from hardcoded frontend arrays to PostgreSQL database with UUID-based schema
+- **API Integration**: Added `/api/categories` endpoint with Drizzle ORM and connected frontend to fetch categories dynamically
+- **Filter Reset**: Implemented "Сбросить" (Reset) button in FilterBar that appears when any filters are active
+- **UI Improvements**: Replaced native select with Shadcn Select component for sort dropdown with better mobile touch support
+- **Image Carousel**: Added swipe-to-browse functionality for product images with smooth opacity transitions (300ms)
+- **Visual Indicators**: Implemented dot indicators for image carousel with active state animation
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -69,6 +78,7 @@ Preferred communication style: Simple, everyday language.
 
 **Current Schema:**
 - `users` table: id (UUID), username (unique text), password (text)
+- `categories` table: id (UUID), name (text), icon (text)
 - Zod validation schemas for type safety
 - Drizzle Zod integration for runtime validation
 
@@ -77,7 +87,6 @@ Preferred communication style: Simple, everyday language.
 - Orders and order items
 - Shopping cart persistence
 - Favorites/wishlist
-- Categories and filtering metadata
 
 ### State Management
 
