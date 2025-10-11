@@ -54,9 +54,27 @@ export default function Home({
   const [selectedSort, setSelectedSort] = useState("new");
 
   const productsPerPage = 12;
-  const totalPages = Math.ceil(mockProducts.length / productsPerPage);
+  
+  // Apply sorting
+  let sortedProducts = [...mockProducts];
+  switch (selectedSort) {
+    case 'new':
+      // Keep original order (newest first)
+      break;
+    case 'old':
+      sortedProducts = sortedProducts.reverse();
+      break;
+    case 'price-asc':
+      sortedProducts = sortedProducts.sort((a, b) => a.price - b.price);
+      break;
+    case 'price-desc':
+      sortedProducts = sortedProducts.sort((a, b) => b.price - a.price);
+      break;
+  }
+  
+  const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
   const startIndex = (currentPage - 1) * productsPerPage;
-  const displayedProducts = mockProducts.slice(startIndex, startIndex + productsPerPage);
+  const displayedProducts = sortedProducts.slice(startIndex, startIndex + productsPerPage);
 
   return (
     <div className="min-h-screen bg-background">
