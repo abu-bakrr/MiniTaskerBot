@@ -7,18 +7,17 @@ export default function FilterBarExample() {
     { id: 'bouquets', name: 'Букеты', icon: '💐' },
   ]
   
-  const colors = ['#FF6B9D', '#FFB6C1', '#DDA0DD', '#E6E6FA', '#FFFACD']
-  
   return (
     <FilterBar 
       categories={categories}
-      colors={colors}
       selectedCategory="all"
-      selectedColor="all"
       selectedSort="new"
+      priceFrom=""
+      priceTo=""
       onCategoryChange={(cat) => console.log('Category:', cat)}
-      onColorChange={(color) => console.log('Color:', color)}
       onSortChange={(sort) => console.log('Sort:', sort)}
+      onPriceFromChange={(price) => console.log('Price from:', price)}
+      onPriceToChange={(price) => console.log('Price to:', price)}
     />
   )
 }

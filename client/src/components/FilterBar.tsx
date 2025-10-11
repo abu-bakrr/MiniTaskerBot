@@ -3,24 +3,26 @@ import { Button } from "@/components/ui/button";
 
 interface FilterBarProps {
   categories?: { id: string; name: string; icon: string }[];
-  colors?: string[];
   selectedCategory?: string;
-  selectedColor?: string;
   selectedSort?: string;
+  priceFrom?: string;
+  priceTo?: string;
   onCategoryChange?: (category: string) => void;
-  onColorChange?: (color: string) => void;
   onSortChange?: (sort: string) => void;
+  onPriceFromChange?: (price: string) => void;
+  onPriceToChange?: (price: string) => void;
 }
 
 export default function FilterBar({
   categories = [],
-  colors = [],
   selectedCategory = "all",
-  selectedColor = "all",
   selectedSort = "new",
+  priceFrom = "",
+  priceTo = "",
   onCategoryChange,
-  onColorChange,
   onSortChange,
+  onPriceFromChange,
+  onPriceToChange,
 }: FilterBarProps) {
   const sortOptions = [
     { value: "new", label: "Новые" },
@@ -58,20 +60,25 @@ export default function FilterBar({
               </Button>
             ))}
 
-            {/* Colors */}
+            {/* Price Range */}
             <div className="flex gap-1 items-center ml-2">
-              {colors.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => onColorChange?.(color)}
-                  className={`w-8 h-8 rounded-full border-2 ${
-                    selectedColor === color ? "border-foreground" : "border-border"
-                  }`}
-                  style={{ backgroundColor: color }}
-                  data-testid={`filter-color-${color}`}
-                  aria-label={`Цвет ${color}`}
-                />
-              ))}
+              <input
+                type="number"
+                placeholder="От"
+                value={priceFrom}
+                onChange={(e) => onPriceFromChange?.(e.target.value)}
+                className="w-20 px-2 py-1 text-sm border border-border rounded-md bg-background"
+                data-testid="input-price-from"
+              />
+              <span className="text-muted-foreground">-</span>
+              <input
+                type="number"
+                placeholder="До"
+                value={priceTo}
+                onChange={(e) => onPriceToChange?.(e.target.value)}
+                className="w-20 px-2 py-1 text-sm border border-border rounded-md bg-background"
+                data-testid="input-price-to"
+              />
             </div>
 
             {/* Sort */}

@@ -27,7 +27,21 @@ const mockCategories = [
   { id: 'peonies', name: 'Пионы', icon: '🏵️' },
 ];
 
-const mockColors = ['#FF6B9D', '#FFB6C1', '#DDA0DD', '#E6E6FA', '#FFFACD'];
+// Map product names to categories
+const productCategories: Record<string, string> = {
+  '1': 'roses',
+  '2': 'tulips',
+  '3': 'peonies',
+  '4': 'bouquets',
+  '5': 'bouquets',
+  '6': 'bouquets',
+  '7': 'peonies',
+  '8': 'bouquets',
+  '9': 'roses',
+  '10': 'bouquets',
+  '11': 'bouquets',
+  '12': 'bouquets',
+};
 
 interface HomeProps {
   onCartClick: () => void;
@@ -50,31 +64,51 @@ export default function Home({
 }: HomeProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedColor, setSelectedColor] = useState("all");
   const [selectedSort, setSelectedSort] = useState("new");
+  const [priceFrom, setPriceFrom] = useState("");
+  const [priceTo, setPriceTo] = useState("");
 
   const productsPerPage = 12;
   
+  // Apply filtering and sorting
+  let filteredProducts = [...mockProducts];
+  
+  // Filter by category
+  if (selectedCategory !== "all") {
+    filteredProducts = filteredProducts.filter(
+      product => productCategories[product.id] === selectedCategory
+    );
+  }
+  
+  // Filter by price range
+  const minPrice = priceFrom ? parseFloat(priceFrom) : 0;
+  const maxPrice = priceTo ? parseFloat(priceTo) : Infinity;
+  
+  if (priceFrom || priceTo) {
+    filteredProducts = filteredProducts.filter(
+      product => product.price >= minPrice && product.price <= maxPrice
+    );
+  }
+  
   // Apply sorting
-  let sortedProducts = [...mockProducts];
   switch (selectedSort) {
     case 'new':
       // Keep original order (newest first)
       break;
     case 'old':
-      sortedProducts = sortedProducts.reverse();
+      filteredProducts = filteredProducts.reverse();
       break;
     case 'price-asc':
-      sortedProducts = sortedProducts.sort((a, b) => a.price - b.price);
+      filteredProducts = filteredProducts.sort((a, b) => a.price - b.price);
       break;
     case 'price-desc':
-      sortedProducts = sortedProducts.sort((a, b) => b.price - a.price);
+      filteredProducts = filteredProducts.sort((a, b) => b.price - a.price);
       break;
   }
   
-  const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   const startIndex = (currentPage - 1) * productsPerPage;
-  const displayedProducts = sortedProducts.slice(startIndex, startIndex + productsPerPage);
+  const displayedProducts = filteredProducts.slice(startIndex, startIndex + productsPerPage);
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,13 +121,14 @@ export default function Home({
       
       <FilterBar
         categories={mockCategories}
-        colors={mockColors}
         selectedCategory={selectedCategory}
-        selectedColor={selectedColor}
         selectedSort={selectedSort}
+        priceFrom={priceFrom}
+        priceTo={priceTo}
         onCategoryChange={setSelectedCategory}
-        onColorChange={setSelectedColor}
         onSortChange={setSelectedSort}
+        onPriceFromChange={setPriceFrom}
+        onPriceToChange={setPriceTo}
       />
 
       <ProductGrid
