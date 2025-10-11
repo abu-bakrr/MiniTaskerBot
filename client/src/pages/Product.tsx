@@ -19,6 +19,8 @@ interface ProductProps {
   onAddToCart: (id: string) => void;
   onToggleFavorite: (id: string) => void;
   isFavorite: boolean;
+  isInCart: boolean;
+  onCartClick: () => void;
 }
 
 export default function Product({
@@ -27,15 +29,19 @@ export default function Product({
   onAddToCart,
   onToggleFavorite,
   isFavorite,
+  isInCart,
+  onCartClick,
 }: ProductProps) {
   return (
     <div className="min-h-screen bg-background pb-6">
       <ProductDetail
         {...mockProduct}
         isFavorite={isFavorite}
+        isInCart={isInCart}
         onToggleFavorite={onToggleFavorite}
         onAddToCart={onAddToCart}
         onBack={onBack}
+        onCartClick={onCartClick}
       />
     </div>
   );

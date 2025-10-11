@@ -1,4 +1,4 @@
-import { Heart, ShoppingCart, ArrowLeft } from "lucide-react";
+import { Heart, ShoppingCart, ArrowLeft, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useRef } from "react";
@@ -10,9 +10,11 @@ interface ProductDetailProps {
   price: number;
   images: string[];
   isFavorite?: boolean;
+  isInCart?: boolean;
   onToggleFavorite?: (id: string) => void;
   onAddToCart?: (id: string) => void;
   onBack?: () => void;
+  onCartClick?: () => void;
 }
 
 export default function ProductDetail({
@@ -22,12 +24,13 @@ export default function ProductDetail({
   price,
   images,
   isFavorite = false,
+  isInCart = false,
   onToggleFavorite,
   onAddToCart,
   onBack,
+  onCartClick,
 }: ProductDetailProps) {
   const [currentImage, setCurrentImage] = useState(0);
-  const [favorite, setFavorite] = useState(isFavorite);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   const touchStartY = useRef(0);
@@ -42,8 +45,15 @@ export default function ProductDetail({
   };
 
   const handleFavorite = () => {
-    setFavorite(!favorite);
     onToggleFavorite?.(id);
+  };
+
+  const handleCartAction = () => {
+    if (isInCart) {
+      onCartClick?.();
+    } else {
+      onAddToCart?.(id);
+    }
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -97,66 +107,66 @@ export default function ProductDetail({
         </div>
 
         {/* Image Gallery */}
-        <div
-          className="relative aspect-square bg-muted"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          <div className="relative w-full h-full">
-            {images.map((img, idx) => (
-              <img
-                key={idx}
-                src={img}
-                alt={name}
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-                  idx === currentImage ? "opacity-100" : "opacity-0"
-                }`}
-              />
-            ))}
-          </div>
-          
-          {/* Image Indicators */}
-          {images.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-              {images.map((_, idx) => (
-                <div
+        <div className="p-4">
+          <div
+            className="relative aspect-square bg-muted rounded-xl overflow-hidden"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            <div className="relative w-full h-full">
+              {images.map((img, idx) => (
+                <img
                   key={idx}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    idx === currentImage 
-                      ? "w-8 bg-foreground" 
-                      : "w-1.5 bg-foreground/40"
+                  src={img}
+                  alt={name}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+                    idx === currentImage ? "opacity-100" : "opacity-0"
                   }`}
                 />
               ))}
             </div>
-          )}
+            
+            {/* Favorite Button */}
+            <button
+              onClick={handleFavorite}
+              className="absolute top-3 left-3 w-9 h-9 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center z-10"
+              data-testid="button-toggle-favorite"
+            >
+              <Heart
+                className={`w-5 h-5 ${isFavorite ? "fill-red-500 text-red-500" : "text-foreground"}`}
+              />
+            </button>
 
-          {/* Favorite Button Overlay */}
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={handleFavorite}
-            className="absolute top-3 right-3 bg-background/90 backdrop-blur-sm"
-            data-testid="button-toggle-favorite"
-          >
-            <Heart
-              className={`w-5 h-5 ${favorite ? "fill-primary text-primary" : ""}`}
-            />
-          </Button>
+            {/* Image Indicators */}
+            {images.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                {images.map((_, idx) => (
+                  <div
+                    key={idx}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      idx === currentImage 
+                        ? "w-4 bg-foreground" 
+                        : "w-1.5 bg-foreground/30"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Product Info */}
-        <div className="p-4 space-y-4">
+        <div className="px-4 space-y-4">
           <div>
             <h1 className="text-2xl font-bold mb-2" data-testid="text-product-detail-name">
               {name}
             </h1>
             <div className="flex items-baseline gap-2">
-              <p className="text-3xl font-bold text-primary" data-testid="text-product-detail-price">
+              <p className="text-3xl font-bold text-foreground" data-testid="text-product-detail-price">
                 {price.toLocaleString()}
               </p>
-              <span className="text-sm text-muted-foreground">сум</span>
+              <span className="text-lg text-muted-foreground">сум</span>
             </div>
           </div>
 
@@ -169,13 +179,23 @@ export default function ProductDetail({
 
           {/* Action Button */}
           <Button
-            onClick={() => onAddToCart?.(id)}
+            onClick={handleCartAction}
             className="w-full gap-2 h-12"
             size="lg"
+            variant={isInCart ? "default" : "default"}
             data-testid="button-add-to-cart-detail"
           >
-            <ShoppingCart className="w-5 h-5" />
-            Добавить в корзину
+            {isInCart ? (
+              <>
+                <Check className="w-5 h-5" />
+                Перейти в корзину
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="w-5 h-5" />
+                Добавить в корзину
+              </>
+            )}
           </Button>
         </div>
       </div>

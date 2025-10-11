@@ -172,6 +172,8 @@ function App() {
               onAddToCart={handleAddToCart}
               onToggleFavorite={handleToggleFavorite}
               isFavorite={favoriteItems.some(item => item.id === selectedProductId)}
+              isInCart={cartItems.some(item => item.id === selectedProductId)}
+              onCartClick={() => setCurrentPage('cart')}
             />
           )}
         </div>
