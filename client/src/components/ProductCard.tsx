@@ -145,8 +145,8 @@ export default function ProductCard({
             {images.map((_, idx) => (
               <div
                 key={idx}
-                className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
-                  idx === currentImage ? "bg-foreground" : "bg-foreground/30"
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  idx === currentImage ? "w-4 bg-foreground" : "w-1.5 bg-foreground/30"
                 }`}
               />
             ))}

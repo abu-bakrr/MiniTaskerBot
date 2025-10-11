@@ -127,8 +127,8 @@ export default function ProductDetail({
               {images.map((_, idx) => (
                 <div
                   key={idx}
-                  className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                    idx === currentImage ? "bg-foreground" : "bg-foreground/30"
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    idx === currentImage ? "w-6 bg-foreground" : "w-2 bg-foreground/30"
                   }`}
                 />
               ))}
