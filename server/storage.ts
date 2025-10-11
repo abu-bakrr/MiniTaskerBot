@@ -1,4 +1,4 @@
-import { type User, type InsertUser } from "@shared/schema";
+import { type User, type InsertUser, type Category, type InsertCategory } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 // modify the interface with any CRUD methods
@@ -8,13 +8,30 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  getCategories(): Promise<Category[]>;
+  createCategory(category: InsertCategory): Promise<Category>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
+  private categories: Map<string, Category>;
 
   constructor() {
     this.users = new Map();
+    this.categories = new Map();
+    
+    // Initialize with default categories
+    const defaultCategories: InsertCategory[] = [
+      { name: 'Розы', icon: '🌹' },
+      { name: 'Тюльпаны', icon: '🌷' },
+      { name: 'Букеты', icon: '💐' },
+      { name: 'Пионы', icon: '🏵️' },
+    ];
+    
+    defaultCategories.forEach(cat => {
+      const id = randomUUID();
+      this.categories.set(id, { ...cat, id });
+    });
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -32,6 +49,17 @@ export class MemStorage implements IStorage {
     const user: User = { ...insertUser, id };
     this.users.set(id, user);
     return user;
+  }
+
+  async getCategories(): Promise<Category[]> {
+    return Array.from(this.categories.values());
+  }
+
+  async createCategory(insertCategory: InsertCategory): Promise<Category> {
+    const id = randomUUID();
+    const category: Category = { ...insertCategory, id };
+    this.categories.set(id, category);
+    return category;
   }
 }
 

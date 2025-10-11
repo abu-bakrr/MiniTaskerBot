@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import FilterBar from "@/components/FilterBar";
 import ProductGrid from "@/components/ProductGrid";
 import Pagination from "@/components/Pagination";
+import type { Category } from "@shared/schema";
 
 //todo: remove mock functionality
 const mockProducts = [
@@ -140,27 +142,20 @@ const mockProducts = [
   },
 ];
 
-const mockCategories = [
-  { id: 'roses', name: 'Розы', icon: '🌹' },
-  { id: 'tulips', name: 'Тюльпаны', icon: '🌷' },
-  { id: 'bouquets', name: 'Букеты', icon: '💐' },
-  { id: 'peonies', name: 'Пионы', icon: '🏵️' },
-];
-
-// Map product names to categories
+// Map product names to categories (will be replaced with DB later)
 const productCategories: Record<string, string> = {
-  '1': 'roses',
-  '2': 'tulips',
-  '3': 'peonies',
-  '4': 'bouquets',
-  '5': 'bouquets',
-  '6': 'bouquets',
-  '7': 'peonies',
-  '8': 'bouquets',
-  '9': 'roses',
-  '10': 'bouquets',
-  '11': 'bouquets',
-  '12': 'bouquets',
+  '1': 'Розы',
+  '2': 'Тюльпаны',
+  '3': 'Пионы',
+  '4': 'Букеты',
+  '5': 'Букеты',
+  '6': 'Букеты',
+  '7': 'Пионы',
+  '8': 'Букеты',
+  '9': 'Розы',
+  '10': 'Букеты',
+  '11': 'Букеты',
+  '12': 'Букеты',
 };
 
 interface HomeProps {
@@ -192,16 +187,32 @@ export default function Home({
   const [priceFrom, setPriceFrom] = useState("");
   const [priceTo, setPriceTo] = useState("");
 
+  // Fetch categories from API
+  const { data: categories = [] } = useQuery<Category[]>({
+    queryKey: ["/api/categories"],
+  });
+
+  const handleResetFilters = () => {
+    setSelectedCategory("all");
+    setSelectedSort("new");
+    setPriceFrom("");
+    setPriceTo("");
+    setCurrentPage(1);
+  };
+
   const productsPerPage = 12;
   
   // Apply filtering and sorting
   let filteredProducts = [...mockProducts];
   
   // Filter by category
-  if (selectedCategory !== "all") {
-    filteredProducts = filteredProducts.filter(
-      product => productCategories[product.id] === selectedCategory
-    );
+  if (selectedCategory !== "all" && categories.length > 0) {
+    const selectedCategoryName = categories.find(cat => cat.id === selectedCategory)?.name;
+    if (selectedCategoryName) {
+      filteredProducts = filteredProducts.filter(
+        product => productCategories[product.id] === selectedCategoryName
+      );
+    }
   }
   
   // Filter by price range
@@ -244,7 +255,7 @@ export default function Home({
       />
       
       <FilterBar
-        categories={mockCategories}
+        categories={categories}
         selectedCategory={selectedCategory}
         selectedSort={selectedSort}
         priceFrom={priceFrom}
@@ -253,6 +264,7 @@ export default function Home({
         onSortChange={setSelectedSort}
         onPriceFromChange={setPriceFrom}
         onPriceToChange={setPriceTo}
+        onReset={handleResetFilters}
       />
 
       <ProductGrid

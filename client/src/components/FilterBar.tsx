@@ -1,5 +1,12 @@
-import { ChevronDown } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface FilterBarProps {
   categories?: { id: string; name: string; icon: string }[];
@@ -11,6 +18,7 @@ interface FilterBarProps {
   onSortChange?: (sort: string) => void;
   onPriceFromChange?: (price: string) => void;
   onPriceToChange?: (price: string) => void;
+  onReset?: () => void;
 }
 
 export default function FilterBar({
@@ -23,6 +31,7 @@ export default function FilterBar({
   onSortChange,
   onPriceFromChange,
   onPriceToChange,
+  onReset,
 }: FilterBarProps) {
   const sortOptions = [
     { value: "new", label: "Новые" },
@@ -31,11 +40,13 @@ export default function FilterBar({
     { value: "price-desc", label: "Дороже" },
   ];
 
+  const hasActiveFilters = selectedCategory !== "all" || priceFrom !== "" || priceTo !== "" || selectedSort !== "new";
+
   return (
     <div className="sticky top-[61px] z-40 bg-background border-b border-border py-3" data-testid="filter-bar">
       <div className="max-w-[420px] mx-auto">
         <div className="overflow-x-auto scrollbar-hide px-4">
-          <div className="flex gap-2 pb-1 min-w-max">
+          <div className="flex gap-2 pb-1 min-w-max items-center">
             {/* Categories */}
             <Button
               size="sm"
@@ -81,22 +92,36 @@ export default function FilterBar({
               />
             </div>
 
-            {/* Sort */}
-            <div className="relative ml-2">
-              <select
-                value={selectedSort}
-                onChange={(e) => onSortChange?.(e.target.value)}
-                className="appearance-none bg-background border border-border rounded-full px-3 py-1.5 pr-8 text-sm cursor-pointer"
+            {/* Sort with Shadcn Select */}
+            <Select value={selectedSort} onValueChange={onSortChange}>
+              <SelectTrigger 
+                className="w-[110px] h-8 rounded-full text-sm ml-2" 
                 data-testid="filter-sort"
               >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
                 {sortOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
+                  <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
-                  </option>
+                  </SelectItem>
                 ))}
-              </select>
-              <ChevronDown className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground" />
-            </div>
+              </SelectContent>
+            </Select>
+
+            {/* Reset Button */}
+            {hasActiveFilters && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={onReset}
+                className="rounded-full gap-1 ml-2"
+                data-testid="button-reset-filters"
+              >
+                <X className="w-4 h-4" />
+                Сбросить
+              </Button>
+            )}
           </div>
         </div>
       </div>
