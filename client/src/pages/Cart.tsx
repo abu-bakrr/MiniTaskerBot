@@ -9,7 +9,7 @@ interface CartItemData {
   name: string;
   price: number;
   quantity: number;
-  image: string;
+  images: string[];
 }
 
 interface CartProps {

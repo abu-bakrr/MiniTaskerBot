@@ -6,7 +6,7 @@ interface CartItemProps {
   name: string;
   price: number;
   quantity: number;
-  image: string;
+  images: string[];
   onQuantityChange: (id: string, quantity: number) => void;
   onRemove: (id: string) => void;
 }
@@ -16,14 +16,14 @@ export default function CartItem({
   name,
   price,
   quantity,
-  image,
+  images,
   onQuantityChange,
   onRemove,
 }: CartItemProps) {
   return (
     <div className="flex gap-3 p-3 bg-card rounded-md border border-card-border" data-testid={`cart-item-${id}`}>
       <img
-        src={image}
+        src={images[0]}
         alt={name}
         className="w-20 h-20 object-cover rounded-md"
       />

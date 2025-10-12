@@ -71,7 +71,10 @@ seed.on('close', (code) => {
 // Proxy API requests to Flask
 app.use('/api', createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
-  changeOrigin: true
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api': '' // Remove /api prefix when forwarding to Flask
+  }
 }));
 
 // Setup Vite for frontend
