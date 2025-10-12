@@ -50,6 +50,7 @@ def seed_database():
         CREATE TABLE IF NOT EXISTS products (
             id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
             name TEXT NOT NULL,
+            description TEXT,
             price INTEGER NOT NULL,
             images TEXT[] NOT NULL,
             category_id VARCHAR REFERENCES categories(id)
@@ -110,6 +111,7 @@ def seed_database():
             products = [
                 {
                     'name': 'Букет красных роз',
+                    'description': 'Изысканный букет из свежих красных роз премиум класса. Идеально подходит для выражения любви и признательности. В букете 15 крупных бутонов.',
                     'price': 150000,
                     'images': [
                         'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400&h=400&fit=crop',
@@ -120,6 +122,7 @@ def seed_database():
                 },
                 {
                     'name': 'Розовые тюльпаны',
+                    'description': 'Нежные розовые тюльпаны из Голландии. Символ весны и новых начинаний. Букет из 25 свежих цветов.',
                     'price': 90000,
                     'images': [
                         'https://images.unsplash.com/photo-1520763185298-1b434c919102?w=400&h=400&fit=crop',
@@ -130,6 +133,7 @@ def seed_database():
                 },
                 {
                     'name': 'Белые пионы',
+                    'description': 'Роскошные белые пионы с нежным ароматом. Идеальны для свадеб и торжественных мероприятий. Букет из 11 пионов.',
                     'price': 120000,
                     'images': [
                         'https://images.unsplash.com/photo-1591886960571-74d43a9d4166?w=400&h=400&fit=crop',
@@ -140,6 +144,7 @@ def seed_database():
                 },
                 {
                     'name': 'Букет полевых цветов',
+                    'description': 'Яркий букет из полевых цветов. Создает атмосферу лета и свободы. Микс из различных сезонных цветов.',
                     'price': 75000,
                     'images': [
                         'https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=400&h=400&fit=crop',
@@ -150,6 +155,7 @@ def seed_database():
                 },
                 {
                     'name': 'Фиолетовые лаванды',
+                    'description': 'Ароматная лаванда с юга Франции. Успокаивающий аромат и нежная красота. Букет из 50 веточек.',
                     'price': 85000,
                     'images': [
                         'https://images.unsplash.com/photo-1499002238440-d264edd596ec?w=400&h=400&fit=crop',
@@ -160,6 +166,7 @@ def seed_database():
                 },
                 {
                     'name': 'Желтые герберы',
+                    'description': 'Солнечные герберы, поднимающие настроение. Яркие и жизнерадостные цветы. Букет из 15 крупных гербер.',
                     'price': 95000,
                     'images': [
                         'https://images.unsplash.com/photo-1477414348463-c0eb7f1359b6?w=400&h=400&fit=crop',
@@ -170,6 +177,7 @@ def seed_database():
                 },
                 {
                     'name': 'Розовые пионы',
+                    'description': 'Очаровательные розовые пионы с пышными бутонами. Символ романтики и женственности. Букет из 9 пионов.',
                     'price': 130000,
                     'images': [
                         'https://images.unsplash.com/photo-1588509095738-c342c5d917d2?w=400&h=400&fit=crop',
@@ -180,6 +188,7 @@ def seed_database():
                 },
                 {
                     'name': 'Подсолнухи',
+                    'description': 'Яркие подсолнухи, символ счастья и оптимизма. Поднимают настроение в любую погоду. Букет из 7 больших подсолнухов.',
                     'price': 70000,
                     'images': [
                         'https://images.unsplash.com/photo-1597848212624-e30b9aeb6394?w=400&h=400&fit=crop',
@@ -190,6 +199,7 @@ def seed_database():
                 },
                 {
                     'name': 'Белые розы',
+                    'description': 'Элегантные белые розы, символ чистоты и невинности. Классический выбор для особых случаев. Букет из 21 розы.',
                     'price': 140000,
                     'images': [
                         'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=400&h=400&fit=crop',
@@ -200,6 +210,7 @@ def seed_database():
                 },
                 {
                     'name': 'Сиреневые хризантемы',
+                    'description': 'Изящные хризантемы сиреневого оттенка. Долго сохраняют свежесть. Букет из 15 веточек.',
                     'price': 100000,
                     'images': [
                         'https://images.unsplash.com/photo-1563535655-c6d52fdf3a89?w=400&h=400&fit=crop',
@@ -210,6 +221,7 @@ def seed_database():
                 },
                 {
                     'name': 'Смешанный букет',
+                    'description': 'Оригинальный микс из различных сезонных цветов. Каждый букет уникален. Яркое сочетание форм и оттенков.',
                     'price': 110000,
                     'images': [
                         'https://images.unsplash.com/photo-1487070183336-b863922373d4?w=400&h=400&fit=crop',
@@ -220,6 +232,7 @@ def seed_database():
                 },
                 {
                     'name': 'Орхидеи',
+                    'description': 'Экзотические орхидеи премиум класса. Символ роскоши и утонченности. Композиция из 5 веток орхидей.',
                     'price': 160000,
                     'images': [
                         'https://images.unsplash.com/photo-1584714268709-c3dd9c92b378?w=400&h=400&fit=crop',
@@ -233,8 +246,8 @@ def seed_database():
             for product in products:
                 category_id = category_ids.get(product['category'])
                 cur.execute(
-                    'INSERT INTO products (name, price, images, category_id) VALUES (%s, %s, %s, %s)',
-                    (product['name'], product['price'], product['images'], category_id)
+                    'INSERT INTO products (name, description, price, images, category_id) VALUES (%s, %s, %s, %s, %s)',
+                    (product['name'], product.get('description'), product['price'], product['images'], category_id)
                 )
             
             conn.commit()

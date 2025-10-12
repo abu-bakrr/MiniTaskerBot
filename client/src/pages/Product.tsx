@@ -1,6 +1,15 @@
+import { useQuery } from "@tanstack/react-query";
 import ProductDetail from "@/components/ProductDetail";
 
-//todo: remove mock functionality
+interface ProductData {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  images: string[];
+  category_id: string;
+}
+
 const mockProducts: Record<string, { id: string; name: string; description: string; price: number; images: string[] }> = {
   '1': {
     id: '1',
@@ -155,12 +164,35 @@ export default function Product({
   isInCart,
   onCartClick,
 }: ProductProps) {
-  const product = mockProducts[productId] || mockProducts['1'];
+  // Load product from API
+  const { data: product, isLoading } = useQuery<ProductData>({
+    queryKey: ["/api/products", productId],
+    queryFn: async () => {
+      const response = await fetch(`/api/products/${productId}`);
+      if (!response.ok) throw new Error('Product not found');
+      return response.json();
+    }
+  });
+
+  // Fallback to mock data if API fails or returns no data
+  const displayProduct = product || mockProducts[productId] || mockProducts['1'];
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Загрузка товара...</p>
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen bg-background pb-6">
       <ProductDetail
-        {...product}
+        id={displayProduct.id}
+        name={displayProduct.name}
+        description={displayProduct.description || 'Описание товара'}
+        price={displayProduct.price}
+        images={displayProduct.images}
         isFavorite={isFavorite}
         isInCart={isInCart}
         onToggleFavorite={onToggleFavorite}

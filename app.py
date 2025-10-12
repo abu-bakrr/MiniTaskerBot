@@ -54,6 +54,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS products (
             id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
             name TEXT NOT NULL,
+            description TEXT,
             price INTEGER NOT NULL,
             images TEXT[] NOT NULL,
             category_id VARCHAR REFERENCES categories(id)
@@ -142,8 +143,8 @@ def create_product():
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute(
-            'INSERT INTO products (name, price, images, category_id) VALUES (%s, %s, %s, %s) RETURNING *',
-            (data['name'], data['price'], data['images'], data.get('category_id'))
+            'INSERT INTO products (name, description, price, images, category_id) VALUES (%s, %s, %s, %s, %s) RETURNING *',
+            (data['name'], data.get('description'), data['price'], data['images'], data.get('category_id'))
         )
         product = cur.fetchone()
         conn.commit()
