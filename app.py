@@ -81,7 +81,7 @@ def init_db():
 
 # API Routes
 
-@app.route('/api/categories', methods=['GET'])
+@app.route('/categories', methods=['GET'])
 def get_categories():
     try:
         conn = get_db_connection()
@@ -94,7 +94,7 @@ def get_categories():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/categories', methods=['POST'])
+@app.route('/categories', methods=['POST'])
 def create_category():
     try:
         data = request.json
@@ -112,7 +112,7 @@ def create_category():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/products', methods=['GET'])
+@app.route('/products', methods=['GET'])
 def get_products():
     try:
         category_id = request.args.get('category_id')
@@ -131,7 +131,7 @@ def get_products():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/products', methods=['POST'])
+@app.route('/products', methods=['POST'])
 def create_product():
     try:
         data = request.json
@@ -149,7 +149,7 @@ def create_product():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/products/<product_id>', methods=['GET'])
+@app.route('/products/<product_id>', methods=['GET'])
 def get_product(product_id):
     try:
         conn = get_db_connection()
@@ -165,7 +165,7 @@ def get_product(product_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/favorites/<user_id>', methods=['GET'])
+@app.route('/favorites/<user_id>', methods=['GET'])
 def get_favorites(user_id):
     try:
         conn = get_db_connection()
@@ -182,7 +182,7 @@ def get_favorites(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/favorites', methods=['POST'])
+@app.route('/favorites', methods=['POST'])
 def add_to_favorites():
     try:
         data = request.json
@@ -200,7 +200,7 @@ def add_to_favorites():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/favorites/<user_id>/<product_id>', methods=['DELETE'])
+@app.route('/favorites/<user_id>/<product_id>', methods=['DELETE'])
 def remove_from_favorites(user_id, product_id):
     try:
         conn = get_db_connection()
@@ -217,7 +217,7 @@ def remove_from_favorites(user_id, product_id):
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    init_db()
+    # Tables are created by seed_db.py, no need to call init_db here
     # Flask API runs on port 5000
     # Vite dev server will run on 5173 during development
     port = int(os.getenv('PORT', 5000))
