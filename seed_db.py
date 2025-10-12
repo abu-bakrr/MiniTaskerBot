@@ -3,19 +3,36 @@ from psycopg2.extras import RealDictCursor
 import os
 
 def seed_database():
+    # Debug: print all environment variables starting with PG or DATABASE
+    print(f"=== Environment Variables ===")
+    for key in sorted(os.environ.keys()):
+        if key.startswith('PG') or key.startswith('DATABASE') or key.startswith('REPL'):
+            print(f"{key} = {os.environ[key][:50] if len(os.environ[key]) > 50 else os.environ[key]}")
+    print(f"=== End Environment Variables ===")
+    
     # Use DATABASE_URL if available, otherwise build from individual vars
     database_url = os.getenv('DATABASE_URL')
     
+    print(f"Connecting to database...")
+    print(f"DATABASE_URL exists: {'Yes' if database_url else 'No'}")
+    
     if database_url:
+        # Add sslmode=require for Neon database
+        if 'sslmode=' not in database_url:
+            database_url = database_url + ('&' if '?' in database_url else '?') + 'sslmode=require'
         conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
     else:
         # Build connection from individual PostgreSQL environment variables
+        pghost = os.getenv('PGHOST')
+        print(f"PGHOST: {pghost if pghost else 'Not set'}")
+        
         conn = psycopg2.connect(
-            host=os.getenv('PGHOST', 'localhost'),
+            host=pghost,
             port=os.getenv('PGPORT', '5432'),
-            user=os.getenv('PGUSER', 'postgres'),
-            password=os.getenv('PGPASSWORD', ''),
-            database=os.getenv('PGDATABASE', 'postgres'),
+            user=os.getenv('PGUSER'),
+            password=os.getenv('PGPASSWORD'),
+            database=os.getenv('PGDATABASE'),
+            sslmode='require',
             cursor_factory=RealDictCursor
         )
     cur = conn.cursor()

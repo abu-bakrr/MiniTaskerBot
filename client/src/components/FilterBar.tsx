@@ -100,7 +100,7 @@ export default function FilterBar({
               >
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent side="bottom" align="center" position="popper">
                 {sortOptions.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}

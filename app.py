@@ -18,15 +18,19 @@ def get_db_connection():
     print(f"DEBUG: PGDATABASE = {os.getenv('PGDATABASE', 'NOT SET')}")
     
     if database_url:
+        # Add sslmode=require for Neon database
+        if 'sslmode=' not in database_url:
+            database_url = database_url + ('&' if '?' in database_url else '?') + 'sslmode=require'
         conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
     else:
         # Build connection from individual PostgreSQL environment variables
         conn = psycopg2.connect(
-            host=os.getenv('PGHOST', 'localhost'),
+            host=os.getenv('PGHOST'),
             port=os.getenv('PGPORT', '5432'),
-            user=os.getenv('PGUSER', 'postgres'),
-            password=os.getenv('PGPASSWORD', ''),
-            database=os.getenv('PGDATABASE', 'postgres'),
+            user=os.getenv('PGUSER'),
+            password=os.getenv('PGPASSWORD'),
+            database=os.getenv('PGDATABASE'),
+            sslmode='require',
             cursor_factory=RealDictCursor
         )
     return conn
