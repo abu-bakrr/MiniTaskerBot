@@ -27,6 +27,18 @@ export default function ProductGrid({
   cartItemIds = [],
   onCartClick,
 }: ProductGridProps) {
+  if (products.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center" data-testid="empty-products">
+        <div className="text-6xl mb-4">🌸</div>
+        <h3 className="text-lg font-medium text-foreground mb-2">Товаров нет</h3>
+        <p className="text-sm text-muted-foreground">
+          В данный момент нет доступных товаров
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-2 gap-3 p-4 max-w-[420px] mx-auto" data-testid="grid-products">
       {products.map((product) => (
