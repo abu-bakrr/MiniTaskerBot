@@ -1,9 +1,6 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 def seed_database():
     # Use DATABASE_URL if available, otherwise build from individual vars
@@ -22,6 +19,44 @@ def seed_database():
             cursor_factory=RealDictCursor
         )
     cur = conn.cursor()
+    
+    # Create tables if they don't exist
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS categories (
+            id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+            name TEXT NOT NULL,
+            icon TEXT NOT NULL
+        )
+    ''')
+    
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS products (
+            id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+            name TEXT NOT NULL,
+            price INTEGER NOT NULL,
+            images TEXT[] NOT NULL,
+            category_id VARCHAR REFERENCES categories(id)
+        )
+    ''')
+    
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+            username TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL
+        )
+    ''')
+    
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS favorites (
+            id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+            user_id VARCHAR REFERENCES users(id) ON DELETE CASCADE,
+            product_id VARCHAR REFERENCES products(id) ON DELETE CASCADE,
+            UNIQUE(user_id, product_id)
+        )
+    ''')
+    
+    conn.commit()
     
     # Check if categories exist
     cur.execute('SELECT COUNT(*) as count FROM categories')
