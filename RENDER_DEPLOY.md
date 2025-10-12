@@ -72,18 +72,16 @@ postgresql://user:password@host:5432/database?sslmode=require
 
 ---
 
-### 4. Инициализация базы данных
+### 4. Инициализация данных (опционально)
 
-После первого успешного деплоя, нужно **один раз** создать таблицы и засеять данные:
+**Таблицы создаются автоматически** при первом запуске приложения! ✅
+
+Если хотите добавить **тестовые данные** (категории и товары), выполните один раз:
 
 #### Вариант A: Через Render Shell (рекомендуется)
 1. В дашборде вашего Web Service нажмите **"Shell"**
-2. Выполните команды:
+2. Выполните:
    ```bash
-   # Создать таблицы
-   python init_tables.py
-   
-   # Засеять тестовые данные (опционально)
    python seed_db.py
    ```
 
@@ -92,7 +90,6 @@ postgresql://user:password@host:5432/database?sslmode=require
 2. Локально выполните:
    ```bash
    export DATABASE_URL="postgresql://..."
-   python init_tables.py
    python seed_db.py
    ```
 
@@ -125,10 +122,11 @@ gunicorn app:app --bind 0.0.0.0:$PORT --workers 4 --timeout 120
 ```
 
 ### `init_tables.py`
-Создает таблицы в БД (запускать вручную один раз):
+Вспомогательный скрипт для создания таблиц вручную (если нужно):
 ```bash
 python init_tables.py
 ```
+⚠️ **Не обязательно** - таблицы создаются автоматически при старте app.py
 
 ### `seed_db.py`
 Добавляет тестовые данные (запускать вручную при необходимости):
@@ -159,11 +157,7 @@ python seed_db.py
 
 ### Проблема: "No module named 'gunicorn'"
 - Убедитесь, что в Build Command указано: `pip install -r requirements.txt`
-- Проверьте, что файл `requirements.txt` существует в корне проекта
-
-### Проблема: "Database tables don't exist"
-- Выполните `python init_tables.py` через Render Shell
-- Или запустите локально с правильным `DATABASE_URL`
+- Проверьте, что Gunicorn установлен в зависимостях
 
 ### Проблема: "No products displayed"
 - База данных пустая, выполните: `python seed_db.py`
