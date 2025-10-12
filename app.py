@@ -1,0 +1,209 @@
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+app = Flask(__name__)
+CORS(app)
+
+# Database connection
+def get_db_connection():
+    conn = psycopg2.connect(
+        os.getenv('DATABASE_URL'),
+        cursor_factory=RealDictCursor
+    )
+    return conn
+
+# Initialize database tables
+def init_db():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Create categories table if not exists
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS categories (
+            id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+            name TEXT NOT NULL,
+            icon TEXT NOT NULL
+        )
+    ''')
+    
+    # Create products table
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS products (
+            id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+            name TEXT NOT NULL,
+            price INTEGER NOT NULL,
+            images TEXT[] NOT NULL,
+            category_id VARCHAR REFERENCES categories(id)
+        )
+    ''')
+    
+    # Create users table if not exists
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+            username TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL
+        )
+    ''')
+    
+    # Create favorites table (many-to-many: users <-> products)
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS favorites (
+            id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+            user_id VARCHAR REFERENCES users(id) ON DELETE CASCADE,
+            product_id VARCHAR REFERENCES products(id) ON DELETE CASCADE,
+            UNIQUE(user_id, product_id)
+        )
+    ''')
+    
+    conn.commit()
+    cur.close()
+    conn.close()
+
+# API Routes
+
+@app.route('/api/categories', methods=['GET'])
+def get_categories():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM categories')
+        categories = cur.fetchall()
+        cur.close()
+        conn.close()
+        return jsonify(categories)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/categories', methods=['POST'])
+def create_category():
+    try:
+        data = request.json
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            'INSERT INTO categories (name, icon) VALUES (%s, %s) RETURNING *',
+            (data['name'], data['icon'])
+        )
+        category = cur.fetchone()
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify(category), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/products', methods=['GET'])
+def get_products():
+    try:
+        category_id = request.args.get('category_id')
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        if category_id:
+            cur.execute('SELECT * FROM products WHERE category_id = %s', (category_id,))
+        else:
+            cur.execute('SELECT * FROM products')
+        
+        products = cur.fetchall()
+        cur.close()
+        conn.close()
+        return jsonify(products)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/products', methods=['POST'])
+def create_product():
+    try:
+        data = request.json
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            'INSERT INTO products (name, price, images, category_id) VALUES (%s, %s, %s, %s) RETURNING *',
+            (data['name'], data['price'], data['images'], data.get('category_id'))
+        )
+        product = cur.fetchone()
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify(product), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/products/<product_id>', methods=['GET'])
+def get_product(product_id):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM products WHERE id = %s', (product_id,))
+        product = cur.fetchone()
+        cur.close()
+        conn.close()
+        
+        if product:
+            return jsonify(product)
+        return jsonify({'error': 'Product not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/favorites/<user_id>', methods=['GET'])
+def get_favorites(user_id):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT p.* FROM products p
+            JOIN favorites f ON p.id = f.product_id
+            WHERE f.user_id = %s
+        ''', (user_id,))
+        favorites = cur.fetchall()
+        cur.close()
+        conn.close()
+        return jsonify(favorites)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/favorites', methods=['POST'])
+def add_to_favorites():
+    try:
+        data = request.json
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            'INSERT INTO favorites (user_id, product_id) VALUES (%s, %s) ON CONFLICT (user_id, product_id) DO NOTHING RETURNING *',
+            (data['user_id'], data['product_id'])
+        )
+        favorite = cur.fetchone()
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify(favorite), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/favorites/<user_id>/<product_id>', methods=['DELETE'])
+def remove_from_favorites(user_id, product_id):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            'DELETE FROM favorites WHERE user_id = %s AND product_id = %s',
+            (user_id, product_id)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify({'message': 'Removed from favorites'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    init_db()
+    # Run Flask API on port 5001 (Vite dev server uses 5000 for frontend)
+    app.run(host='0.0.0.0', port=5001, debug=True)
