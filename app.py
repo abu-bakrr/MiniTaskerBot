@@ -12,10 +12,26 @@ CORS(app)
 
 # Database connection
 def get_db_connection():
-    conn = psycopg2.connect(
-        os.getenv('DATABASE_URL'),
-        cursor_factory=RealDictCursor
-    )
+    # Use DATABASE_URL if available, otherwise build from individual vars
+    database_url = os.getenv('DATABASE_URL')
+    
+    # Debug: print database connection info
+    print(f"DEBUG: DATABASE_URL = {database_url if database_url else 'NOT SET'}")
+    print(f"DEBUG: PGHOST = {os.getenv('PGHOST', 'NOT SET')}")
+    print(f"DEBUG: PGDATABASE = {os.getenv('PGDATABASE', 'NOT SET')}")
+    
+    if database_url:
+        conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
+    else:
+        # Build connection from individual PostgreSQL environment variables
+        conn = psycopg2.connect(
+            host=os.getenv('PGHOST', 'localhost'),
+            port=os.getenv('PGPORT', '5432'),
+            user=os.getenv('PGUSER', 'postgres'),
+            password=os.getenv('PGPASSWORD', ''),
+            database=os.getenv('PGDATABASE', 'postgres'),
+            cursor_factory=RealDictCursor
+        )
     return conn
 
 # Initialize database tables
@@ -205,5 +221,7 @@ def remove_from_favorites(user_id, product_id):
 
 if __name__ == '__main__':
     init_db()
-    # Run Flask API on port 5001 (Vite dev server uses 5000 for frontend)
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    # Flask API runs on port 5000
+    # Vite dev server will run on 5173 during development
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)

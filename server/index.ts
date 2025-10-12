@@ -1,71 +1,62 @@
-import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { spawn } from 'child_process';
+import { log } from "./vite";
 
-const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// Start Flask application instead of Express
+log("Starting Flask API server...");
 
-app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
-    }
-  });
-
-  next();
+// First, seed the database
+const seed = spawn('python', ['seed_db.py'], {
+  env: process.env,
+  stdio: 'pipe'
 });
 
-(async () => {
-  const server = await registerRoutes(app);
+seed.stdout?.on('data', (data) => {
+  log(data.toString().trim(), "seed");
+});
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+seed.stderr?.on('data', (data) => {
+  console.error(`Seed error: ${data}`);
+});
 
-    res.status(status).json({ message });
-    throw err;
-  });
+seed.on('close', (code) => {
+  if (code === 0) {
+    log("Database seeded successfully", "seed");
+    
+    // Now start Flask server
+    const flask = spawn('python', ['app.py'], {
+      stdio: 'inherit',
+      env: process.env
+    });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
+    flask.on('error', (error) => {
+      console.error(`Failed to start Flask: ${error.message}`);
+      process.exit(1);
+    });
+
+    flask.on('exit', (code) => {
+      log(`Flask process exited with code ${code}`, "flask");
+      process.exit(code || 0);
+    });
+
+    // Handle termination signals
+    process.on('SIGTERM', () => {
+      flask.kill('SIGTERM');
+    });
+
+    process.on('SIGINT', () => {
+      flask.kill('SIGINT');
+    });
   } else {
-    serveStatic(app);
-  }
+    log(`Database seed failed with code ${code}`, "seed");
+    // Continue with Flask anyway
+    const flask = spawn('python', ['app.py'], {
+      stdio: 'inherit',
+      env: process.env
+    });
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
-})();
+    flask.on('error', (error) => {
+      console.error(`Failed to start Flask: ${error.message}`);
+      process.exit(1);
+    });
+  }
+});

@@ -6,10 +6,21 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def seed_database():
-    conn = psycopg2.connect(
-        os.getenv('DATABASE_URL'),
-        cursor_factory=RealDictCursor
-    )
+    # Use DATABASE_URL if available, otherwise build from individual vars
+    database_url = os.getenv('DATABASE_URL')
+    
+    if database_url:
+        conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
+    else:
+        # Build connection from individual PostgreSQL environment variables
+        conn = psycopg2.connect(
+            host=os.getenv('PGHOST', 'localhost'),
+            port=os.getenv('PGPORT', '5432'),
+            user=os.getenv('PGUSER', 'postgres'),
+            password=os.getenv('PGPASSWORD', ''),
+            database=os.getenv('PGDATABASE', 'postgres'),
+            cursor_factory=RealDictCursor
+        )
     cur = conn.cursor()
     
     # Check if categories exist
