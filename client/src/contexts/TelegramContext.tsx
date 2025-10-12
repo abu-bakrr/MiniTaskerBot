@@ -43,7 +43,7 @@ export function TelegramProvider({ children }: TelegramProviderProps) {
           setTelegramData(telegramUser);
           
           // Authenticate with backend
-          const response = await fetch('/auth/telegram', {
+          const response = await fetch('/api/auth/telegram', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -61,7 +61,7 @@ export function TelegramProvider({ children }: TelegramProviderProps) {
         } else {
           // For development/testing: use mock user
           console.log('No Telegram data found, using mock user for development');
-          const mockResponse = await fetch('/auth/telegram', {
+          const mockResponse = await fetch('/api/auth/telegram', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -81,7 +81,7 @@ export function TelegramProvider({ children }: TelegramProviderProps) {
         console.error('Telegram init error:', error);
         // Fallback to mock user
         try {
-          const mockResponse = await fetch('/auth/telegram', {
+          const mockResponse = await fetch('/api/auth/telegram', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
