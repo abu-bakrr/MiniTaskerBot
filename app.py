@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, Blueprint
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import os
@@ -6,6 +6,9 @@ import requests
 from datetime import datetime
 
 app = Flask(__name__, static_folder='dist/public', static_url_path='')
+
+# Create API Blueprint with /api prefix for Render deployment
+api = Blueprint('api', __name__, url_prefix='/api')
 
 
 # Database connection
@@ -427,6 +430,73 @@ def create_order():
         return jsonify({'message': 'Order created successfully'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# ============================================================
+# API Blueprint Routes (with /api prefix for Render deployment)
+# ============================================================
+
+@api.route('/categories', methods=['GET'])
+def api_get_categories():
+    return get_categories()
+
+@api.route('/categories', methods=['POST'])
+def api_create_category():
+    return create_category()
+
+@api.route('/products', methods=['GET'])
+def api_get_products():
+    return get_products()
+
+@api.route('/products', methods=['POST'])
+def api_create_product():
+    return create_product()
+
+@api.route('/products/<product_id>', methods=['GET'])
+def api_get_product(product_id):
+    return get_product(product_id)
+
+@api.route('/favorites/<user_id>', methods=['GET'])
+def api_get_favorites(user_id):
+    return get_favorites(user_id)
+
+@api.route('/favorites', methods=['POST'])
+def api_add_to_favorites():
+    return add_to_favorites()
+
+@api.route('/favorites/<user_id>/<product_id>', methods=['DELETE'])
+def api_remove_from_favorites(user_id, product_id):
+    return remove_from_favorites(user_id, product_id)
+
+@api.route('/auth/telegram', methods=['POST'])
+def api_auth_telegram():
+    return telegram_auth()
+
+@api.route('/cart/<user_id>', methods=['GET'])
+def api_get_cart(user_id):
+    return get_cart(user_id)
+
+@api.route('/cart', methods=['POST'])
+def api_add_to_cart():
+    return add_to_cart()
+
+@api.route('/cart', methods=['PUT'])
+def api_update_cart():
+    return update_cart_quantity()
+
+@api.route('/cart/<user_id>/<product_id>', methods=['DELETE'])
+def api_remove_from_cart(user_id, product_id):
+    return remove_from_cart(user_id, product_id)
+
+@api.route('/cart/<user_id>', methods=['DELETE'])
+def api_clear_cart(user_id):
+    return clear_cart(user_id)
+
+@api.route('/orders', methods=['POST'])
+def api_create_order():
+    return create_order()
+
+# Register the API blueprint
+app.register_blueprint(api)
 
 # Serve React App - this must be the last route
 @app.route('/', defaults={'path': ''})
