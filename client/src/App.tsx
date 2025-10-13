@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { TelegramProvider, useTelegram } from "@/contexts/TelegramContext";
 import { useCart } from "@/hooks/useCart";
 import { useFavorites } from "@/hooks/useFavorites";
-import { UserDebugBadge } from "@/components/UserDebugBadge";
 import Home from "@/pages/Home";
 import Cart from "@/pages/Cart";
 import Favorites from "@/pages/Favorites";
@@ -94,9 +93,14 @@ function AppContent() {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-muted-foreground">Ошибка авторизации</p>
+      <div className="flex items-center justify-center min-h-screen p-6">
+        <div className="text-center max-w-md">
+          <div className="text-6xl mb-4">📱</div>
+          <h2 className="text-xl font-semibold mb-2">Откройте в Telegram</h2>
+          <p className="text-muted-foreground">
+            Это приложение работает только в Telegram mini app. 
+            Пожалуйста, откройте его через Telegram.
+          </p>
         </div>
       </div>
     );
@@ -104,7 +108,6 @@ function AppContent() {
 
   return (
     <div className="max-w-[420px] mx-auto bg-background min-h-screen">
-      <UserDebugBadge />
       {currentPage === 'home' && (
         <Home
           onCartClick={() => setCurrentPage('cart')}

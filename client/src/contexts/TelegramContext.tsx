@@ -73,70 +73,10 @@ export function TelegramProvider({ children }: TelegramProviderProps) {
             setUser(data.user);
           }
         } else {
-          // For development/testing: use mock user
-          console.log('🟡 MOCK USER MODE:', {
-            source: 'Browser (not Telegram)',
-            telegram_id: 123456789,
-            username: 'test_user',
-            note: 'Using development test user',
-          });
-          
-          const mockResponse = await fetch('/api/auth/telegram', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              telegram_id: 123456789, // Mock Telegram ID
-              username: 'test_user',
-              first_name: 'Test',
-              last_name: 'User',
-            }),
-          });
-
-          if (mockResponse.ok) {
-            const data = await mockResponse.json();
-            console.log('✅ AUTH SUCCESS (Mock):', {
-              user_id: data.user.id,
-              telegram_id: data.user.telegram_id,
-              is_new_user: data.is_new,
-              username: data.user.username,
-            });
-            setUser(data.user);
-          }
+          console.log('❌ Not running in Telegram mini app');
         }
       } catch (error) {
         console.error('🔴 Telegram init error:', error);
-        // Fallback to mock user
-        console.log('🟡 FALLBACK TO MOCK USER:', {
-          source: 'Error fallback',
-          telegram_id: 123456789,
-          note: 'Telegram SDK failed, using test user',
-        });
-        
-        try {
-          const mockResponse = await fetch('/api/auth/telegram', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              telegram_id: 123456789,
-              username: 'test_user',
-              first_name: 'Test',
-              last_name: 'User',
-            }),
-          });
-
-          if (mockResponse.ok) {
-            const data = await mockResponse.json();
-            console.log('✅ AUTH SUCCESS (Fallback):', {
-              user_id: data.user.id,
-              telegram_id: data.user.telegram_id,
-              is_new_user: data.is_new,
-              username: data.user.username,
-            });
-            setUser(data.user);
-          }
-        } catch (fallbackError) {
-          console.error('🔴 Fallback auth error:', fallbackError);
-        }
       } finally {
         setIsLoading(false);
       }
