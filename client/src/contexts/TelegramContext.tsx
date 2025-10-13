@@ -40,12 +40,6 @@ export function TelegramProvider({ children }: TelegramProviderProps) {
         // Initialize Telegram WebApp if available
         if (window.Telegram?.WebApp) {
           window.Telegram.WebApp.ready();
-          console.log('🔵 Telegram WebApp initialized');
-          console.log('🔍 WebApp data:', {
-            initDataUnsafe: window.Telegram.WebApp.initDataUnsafe,
-            initData: window.Telegram.WebApp.initData,
-            platform: (window.Telegram.WebApp as any).platform,
-          });
         }
 
         // Method 1: Try standard Telegram WebApp API first
@@ -84,7 +78,7 @@ export function TelegramProvider({ children }: TelegramProviderProps) {
           });
           
           // Authenticate with backend
-          const response = await fetch('/api/auth/telegram', {
+          const response = await fetch('/auth/telegram', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
