@@ -3,6 +3,8 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CartItem from "@/components/CartItem";
 import OrderModal from "@/components/OrderModal";
+import { useTelegram } from "@/contexts/TelegramContext";
+import { apiRequest } from "@/lib/queryClient";
 
 interface CartItemData {
   id: string;
@@ -28,11 +30,31 @@ export default function Cart({
   onClearCart,
 }: CartProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { user } = useTelegram();
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const handleCheckout = () => {
     setIsModalOpen(true);
+  };
+
+  const handleOrderComplete = async () => {
+    if (!user?.id) return;
+
+    try {
+      await apiRequest('/api/orders', {
+        method: 'POST',
+        body: JSON.stringify({
+          user_id: user.id,
+          items: orderItems,
+          total: total,
+        }),
+      });
+      onClearCart();
+    } catch (error) {
+      console.error('Failed to create order:', error);
+      onClearCart();
+    }
   };
 
   const orderItems = items.map((item) => ({
@@ -114,7 +136,7 @@ export default function Cart({
         items={orderItems}
         total={total}
         onClose={() => setIsModalOpen(false)}
-        onOrderComplete={onClearCart}
+        onOrderComplete={handleOrderComplete}
       />
     </div>
   );

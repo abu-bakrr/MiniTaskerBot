@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request, send_from_directory
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import os
+import requests
+from datetime import datetime
 
 app = Flask(__name__, static_folder='dist/public', static_url_path='')
 
@@ -354,6 +356,75 @@ def clear_cart(user_id):
         cur.close()
         conn.close()
         return jsonify({'message': 'Cart cleared'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Telegram notification function
+def send_telegram_notification(user_info, cart_items, total):
+    bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+    chat_id = os.getenv('TELEGRAM_CHAT_ID')
+    
+    if not bot_token or not chat_id:
+        print("Telegram credentials not configured")
+        return False
+    
+    # Format the order message
+    user_name = user_info.get('first_name', '') + ' ' + user_info.get('last_name', '')
+    user_name = user_name.strip() or user_info.get('username', 'Неизвестный')
+    telegram_id = user_info.get('telegram_id', 'N/A')
+    
+    message = f"🛍 *Новый заказ!*\n\n"
+    message += f"👤 *Клиент:* {user_name}\n"
+    message += f"🆔 *Telegram ID:* {telegram_id}\n"
+    message += f"📅 *Дата:* {datetime.now().strftime('%d.%m.%Y %H:%M')}\n\n"
+    message += f"📦 *Товары:*\n"
+    
+    for item in cart_items:
+        message += f"• {item['name']} — {item['quantity']} шт. — {item['price']:,} сум\n"
+    
+    message += f"\n💰 *Итого:* {total:,} сум"
+    
+    # Send message via Telegram Bot API
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    payload = {
+        'chat_id': chat_id,
+        'text': message,
+        'parse_mode': 'Markdown'
+    }
+    
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        return response.status_code == 200
+    except Exception as e:
+        print(f"Failed to send Telegram notification: {e}")
+        return False
+
+# Order endpoint
+@app.route('/api/orders', methods=['POST'])
+def create_order():
+    try:
+        data = request.json
+        user_id = data.get('user_id')
+        cart_items = data.get('items', [])
+        total = data.get('total', 0)
+        
+        # Get user info
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM users WHERE id = %s', (user_id,))
+        user_info = cur.fetchone()
+        
+        # Send Telegram notification
+        if user_info:
+            send_telegram_notification(user_info, cart_items, total)
+        
+        # Clear the cart after order
+        cur.execute('DELETE FROM cart WHERE user_id = %s', (user_id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return jsonify({'message': 'Order created successfully'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
