@@ -134,21 +134,21 @@ def seed_database():
             {
                 'name': 'Красные розы "Классика"',
                 'description': 'Букет из 15 красных роз высшего качества',
-                'price': 2500,
+                'price': 300000,
                 'images': ['https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800', 'https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=800'],
                 'category': 'Розы'
             },
             {
                 'name': 'Белые розы "Нежность"',
                 'description': 'Букет из 11 белых роз',
-                'price': 2200,
+                'price': 280000,
                 'images': ['https://images.unsplash.com/photo-1496062031456-07b8f162a322?w=800'],
                 'category': 'Розы'
             },
             {
                 'name': 'Розовые розы "Романтика"',
                 'description': 'Букет из 21 розовой розы',
-                'price': 3500,
+                'price': 450000,
                 'images': ['https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=800'],
                 'category': 'Розы'
             },
@@ -156,14 +156,14 @@ def seed_database():
             {
                 'name': 'Тюльпаны "Весна"',
                 'description': 'Яркий букет из 25 разноцветных тюльпанов',
-                'price': 1800,
+                'price': 230000,
                 'images': ['https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800'],
                 'category': 'Тюльпаны'
             },
             {
                 'name': 'Красные тюльпаны',
                 'description': 'Букет из 15 красных тюльпанов',
-                'price': 1500,
+                'price': 190000,
                 'images': ['https://images.unsplash.com/photo-1520763185298-1b434c919102?w=800'],
                 'category': 'Тюльпаны'
             },
@@ -171,14 +171,14 @@ def seed_database():
             {
                 'name': 'Пионы "Роскошь"',
                 'description': 'Букет из 7 крупных пионов',
-                'price': 3200,
+                'price': 400000,
                 'images': ['https://images.unsplash.com/photo-1591886960571-74d43a9d4166?w=800'],
                 'category': 'Пионы'
             },
             {
                 'name': 'Белые пионы',
                 'description': 'Букет из 5 белых пионов',
-                'price': 2800,
+                'price': 350000,
                 'images': ['https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?w=800'],
                 'category': 'Пионы'
             },
@@ -186,21 +186,21 @@ def seed_database():
             {
                 'name': 'Букет "Летний день"',
                 'description': 'Яркий микс полевых цветов',
-                'price': 2000,
+                'price': 250000,
                 'images': ['https://images.unsplash.com/photo-1487070183336-b863922373d4?w=800'],
                 'category': 'Букеты'
             },
             {
                 'name': 'Букет "Нежность"',
                 'description': 'Романтичный букет в пастельных тонах',
-                'price': 2700,
+                'price': 340000,
                 'images': ['https://images.unsplash.com/photo-1535288262947-259331d73d4f?w=800'],
                 'category': 'Букеты'
             },
             {
                 'name': 'Букет "Премиум"',
                 'description': 'Роскошная композиция из роз и пионов',
-                'price': 4500,
+                'price': 550000,
                 'images': ['https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=800'],
                 'category': 'Букеты'
             },
