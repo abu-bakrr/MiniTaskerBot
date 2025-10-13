@@ -35,11 +35,39 @@ export function TelegramProvider({ children }: TelegramProviderProps) {
   useEffect(() => {
     const initTelegram = async () => {
       try {
-        // Try to get Telegram launch params
-        const { initData } = retrieveLaunchParams();
+        let telegramUser: { id: number; username?: string; firstName?: string; lastName?: string } | null = null;
+
+        // Initialize Telegram WebApp if available
+        if (window.Telegram?.WebApp) {
+          window.Telegram.WebApp.ready();
+          console.log('🔵 Telegram WebApp initialized');
+        }
+
+        // Method 1: Try standard Telegram WebApp API first
+        if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+          const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
+          telegramUser = {
+            id: tgUser.id,
+            username: tgUser.username,
+            firstName: tgUser.first_name,
+            lastName: tgUser.last_name,
+          };
+          console.log('🔵 Got Telegram data from WebApp.initDataUnsafe');
+        } else {
+          // Method 2: Fallback to retrieveLaunchParams
+          try {
+            const { initData } = retrieveLaunchParams();
+            const userData = (initData as any)?.user;
+            if (userData) {
+              telegramUser = userData;
+              console.log('🔵 Got Telegram data from retrieveLaunchParams');
+            }
+          } catch (launchParamsError) {
+            console.log('⚠️ retrieveLaunchParams failed, not in Telegram:', launchParamsError);
+          }
+        }
         
-        if (initData?.user) {
-          const telegramUser = initData.user;
+        if (telegramUser) {
           setTelegramData(telegramUser);
           
           console.log('🔵 TELEGRAM USER DATA:', {
@@ -71,6 +99,8 @@ export function TelegramProvider({ children }: TelegramProviderProps) {
               username: data.user.username,
             });
             setUser(data.user);
+          } else {
+            console.error('❌ Backend authentication failed:', await response.text());
           }
         } else {
           console.log('❌ Not running in Telegram mini app');
