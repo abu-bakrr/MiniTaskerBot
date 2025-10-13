@@ -26,7 +26,7 @@ export function useCart() {
     enabled: !!userId,
   });
 
-  // Add to cart mutation
+  // Add to cart mutation with optimistic update
   const addToCart = useMutation({
     mutationFn: async (productId: string) => {
       if (!userId) throw new Error('User not authenticated');
@@ -39,12 +39,42 @@ export function useCart() {
         }),
       });
     },
-    onSuccess: () => {
+    onMutate: async (productId: string) => {
+      await queryClient.cancelQueries({ queryKey: ['/api/cart', userId] });
+      const previousCart = queryClient.getQueryData<CartItem[]>(['/api/cart', userId]);
+      
+      queryClient.setQueryData<CartItem[]>(['/api/cart', userId], (old = []) => {
+        const existingItem = old.find(item => item.id === productId);
+        if (existingItem) {
+          return old.map(item =>
+            item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
+          );
+        }
+        
+        const newItem: CartItem = {
+          id: productId,
+          product_id: productId,
+          name: '',
+          price: 0,
+          images: [],
+          quantity: 1,
+        };
+        return [...old, newItem];
+      });
+      
+      return { previousCart };
+    },
+    onError: (_err, _productId, context) => {
+      if (context?.previousCart) {
+        queryClient.setQueryData(['/api/cart', userId], context.previousCart);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/cart', userId] });
     },
   });
 
-  // Update quantity mutation
+  // Update quantity mutation with optimistic update
   const updateQuantity = useMutation({
     mutationFn: async ({ productId, quantity }: { productId: string; quantity: number }) => {
       if (!userId) throw new Error('User not authenticated');
@@ -57,12 +87,29 @@ export function useCart() {
         }),
       });
     },
-    onSuccess: () => {
+    onMutate: async ({ productId, quantity }) => {
+      await queryClient.cancelQueries({ queryKey: ['/api/cart', userId] });
+      const previousCart = queryClient.getQueryData<CartItem[]>(['/api/cart', userId]);
+      
+      queryClient.setQueryData<CartItem[]>(['/api/cart', userId], (old = []) => {
+        return old.map(item =>
+          item.id === productId ? { ...item, quantity } : item
+        );
+      });
+      
+      return { previousCart };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previousCart) {
+        queryClient.setQueryData(['/api/cart', userId], context.previousCart);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/cart', userId] });
     },
   });
 
-  // Remove from cart mutation
+  // Remove from cart mutation with optimistic update
   const removeFromCart = useMutation({
     mutationFn: async (productId: string) => {
       if (!userId) throw new Error('User not authenticated');
@@ -70,12 +117,27 @@ export function useCart() {
         method: 'DELETE',
       });
     },
-    onSuccess: () => {
+    onMutate: async (productId: string) => {
+      await queryClient.cancelQueries({ queryKey: ['/api/cart', userId] });
+      const previousCart = queryClient.getQueryData<CartItem[]>(['/api/cart', userId]);
+      
+      queryClient.setQueryData<CartItem[]>(['/api/cart', userId], (old = []) => {
+        return old.filter(item => item.id !== productId);
+      });
+      
+      return { previousCart };
+    },
+    onError: (_err, _productId, context) => {
+      if (context?.previousCart) {
+        queryClient.setQueryData(['/api/cart', userId], context.previousCart);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/cart', userId] });
     },
   });
 
-  // Clear cart mutation
+  // Clear cart mutation with optimistic update
   const clearCart = useMutation({
     mutationFn: async () => {
       if (!userId) throw new Error('User not authenticated');
@@ -83,7 +145,20 @@ export function useCart() {
         method: 'DELETE',
       });
     },
-    onSuccess: () => {
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['/api/cart', userId] });
+      const previousCart = queryClient.getQueryData<CartItem[]>(['/api/cart', userId]);
+      
+      queryClient.setQueryData<CartItem[]>(['/api/cart', userId], []);
+      
+      return { previousCart };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previousCart) {
+        queryClient.setQueryData(['/api/cart', userId], context.previousCart);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/cart', userId] });
     },
   });

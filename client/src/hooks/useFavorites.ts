@@ -26,7 +26,7 @@ export function useFavorites() {
     enabled: !!userId,
   });
 
-  // Add to favorites mutation
+  // Add to favorites mutation with optimistic update
   const addToFavorites = useMutation({
     mutationFn: async (productId: string) => {
       if (!userId) throw new Error('User not authenticated');
@@ -38,12 +38,36 @@ export function useFavorites() {
         }),
       });
     },
-    onSuccess: () => {
+    onMutate: async (productId: string) => {
+      await queryClient.cancelQueries({ queryKey: ['/api/favorites', userId] });
+      const previousFavorites = queryClient.getQueryData<FavoriteItem[]>(['/api/favorites', userId]);
+      
+      queryClient.setQueryData<FavoriteItem[]>(['/api/favorites', userId], (old = []) => {
+        const exists = old.some(item => item.id === productId);
+        if (exists) return old;
+        
+        const newItem: FavoriteItem = {
+          id: productId,
+          name: '',
+          price: 0,
+          images: [],
+        };
+        return [...old, newItem];
+      });
+      
+      return { previousFavorites };
+    },
+    onError: (_err, _productId, context) => {
+      if (context?.previousFavorites) {
+        queryClient.setQueryData(['/api/favorites', userId], context.previousFavorites);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/favorites', userId] });
     },
   });
 
-  // Remove from favorites mutation
+  // Remove from favorites mutation with optimistic update
   const removeFromFavorites = useMutation({
     mutationFn: async (productId: string) => {
       if (!userId) throw new Error('User not authenticated');
@@ -51,7 +75,22 @@ export function useFavorites() {
         method: 'DELETE',
       });
     },
-    onSuccess: () => {
+    onMutate: async (productId: string) => {
+      await queryClient.cancelQueries({ queryKey: ['/api/favorites', userId] });
+      const previousFavorites = queryClient.getQueryData<FavoriteItem[]>(['/api/favorites', userId]);
+      
+      queryClient.setQueryData<FavoriteItem[]>(['/api/favorites', userId], (old = []) => {
+        return old.filter(item => item.id !== productId);
+      });
+      
+      return { previousFavorites };
+    },
+    onError: (_err, _productId, context) => {
+      if (context?.previousFavorites) {
+        queryClient.setQueryData(['/api/favorites', userId], context.previousFavorites);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/favorites', userId] });
     },
   });
