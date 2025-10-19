@@ -1,6 +1,7 @@
 import { Minus, Plus, Trash2, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useConfig } from "@/hooks/useConfig";
 
 interface CartItemProps {
   id: string;
@@ -21,6 +22,7 @@ export default function CartItem({
   onQuantityChange,
   onRemove,
 }: CartItemProps) {
+  const { formatPrice } = useConfig();
   const [imageError, setImageError] = useState(false);
 
   return (
@@ -43,7 +45,7 @@ export default function CartItem({
           {name}
         </h3>
         <p className="text-sm font-semibold mb-2" data-testid={`text-cart-item-price-${id}`}>
-          {price.toLocaleString()} сум
+          {formatPrice(price)}
         </p>
         
         <div className="flex items-center gap-2">

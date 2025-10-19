@@ -2,6 +2,7 @@ import { Heart, ShoppingCart, ArrowLeft, Check, Image as ImageIcon } from "lucid
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useRef } from "react";
+import { useConfig } from "@/hooks/useConfig";
 
 interface ProductDetailProps {
   id: string;
@@ -30,6 +31,7 @@ export default function ProductDetail({
   onBack,
   onCartClick,
 }: ProductDetailProps) {
+  const { formatPrice } = useConfig();
   const [currentImage, setCurrentImage] = useState(0);
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
   const touchStartX = useRef(0);
@@ -177,12 +179,9 @@ export default function ProductDetail({
             <h1 className="text-2xl font-bold mb-2" data-testid="text-product-detail-name">
               {name}
             </h1>
-            <div className="flex items-baseline gap-2">
-              <p className="text-3xl font-bold text-foreground" data-testid="text-product-detail-price">
-                {price.toLocaleString()}
-              </p>
-              <span className="text-lg text-muted-foreground">сум</span>
-            </div>
+            <p className="text-3xl font-bold text-foreground" data-testid="text-product-detail-price">
+              {formatPrice(price)}
+            </p>
           </div>
 
           <div className="border-t pt-4">

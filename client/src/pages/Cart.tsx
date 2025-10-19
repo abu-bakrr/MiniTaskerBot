@@ -5,6 +5,7 @@ import CartItem from "@/components/CartItem";
 import OrderModal from "@/components/OrderModal";
 import { useTelegram } from "@/contexts/TelegramContext";
 import { apiRequest } from "@/lib/queryClient";
+import { useConfig } from "@/hooks/useConfig";
 
 interface CartItemData {
   id: string;
@@ -29,6 +30,7 @@ export default function Cart({
   onRemoveItem,
   onClearCart,
 }: CartProps) {
+  const { formatPrice } = useConfig();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useTelegram();
 
@@ -115,7 +117,7 @@ export default function Cart({
               <div className="flex items-center justify-between mb-4">
                 <span className="text-lg font-semibold">Итого:</span>
                 <span className="text-2xl font-bold text-primary" data-testid="text-cart-total">
-                  {total.toLocaleString()} сум
+                  {formatPrice(total)}
                 </span>
               </div>
               

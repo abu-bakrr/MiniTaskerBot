@@ -1,5 +1,6 @@
 import { Heart, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useConfig } from "@/hooks/useConfig";
 
 interface HeaderProps {
   onFavoritesClick?: () => void;
@@ -14,13 +15,21 @@ export default function Header({
   favoritesCount = 0,
   cartCount = 0 
 }: HeaderProps) {
+  const { config } = useConfig();
+
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border px-4 py-3" data-testid="header-main">
       <div className="max-w-[420px] mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="text-2xl">🌸</div>
+          {config?.logo && (
+            <img 
+              src={config.logo} 
+              alt="Logo" 
+              className="w-8 h-8 object-contain"
+            />
+          )}
           <h1 className="text-lg font-semibold text-foreground" data-testid="text-brand-name">
-            Flowery Bloom
+            {config?.shopName || "Loading..."}
           </h1>
         </div>
         

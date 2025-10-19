@@ -1,6 +1,7 @@
 import { Heart, ShoppingCart, Check, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useRef } from "react";
+import { useConfig } from "@/hooks/useConfig";
 
 interface ProductCardProps {
   id: string;
@@ -27,6 +28,7 @@ export default function ProductCard({
   onClick,
   onCartClick,
 }: ProductCardProps) {
+  const { formatPrice } = useConfig();
   const [currentImage, setCurrentImage] = useState(0);
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
   const touchStartX = useRef(0);
@@ -175,7 +177,7 @@ export default function ProductCard({
         </h3>
         <div className="flex items-center justify-between">
           <p className="text-base font-semibold text-foreground" data-testid={`text-product-price-${id}`}>
-            {price.toLocaleString()} сум
+            {formatPrice(price)}
           </p>
           <Button
             size="icon"
