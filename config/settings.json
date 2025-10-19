@@ -8,6 +8,28 @@
     "position": "after"
   },
   "managerContact": "@flowery_b1oom",
+  "categories": [
+    {
+      "id": "roses",
+      "name": "Розы",
+      "icon": "🌹"
+    },
+    {
+      "id": "tulips",
+      "name": "Тюльпаны",
+      "icon": "🌷"
+    },
+    {
+      "id": "bouquets",
+      "name": "Букеты",
+      "icon": "💐"
+    },
+    {
+      "id": "cards",
+      "name": "Открытки",
+      "icon": "💌"
+    }
+  ],
   "colorScheme": {
     "background": "#FEFEFE",
     "foreground": "#1A1A1A",
