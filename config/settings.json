@@ -1,13 +1,13 @@
 {
-  "shopName": "Flowery Bloom",
-  "description": "Интернет-магазин цветов и открыток",
+  "shopName": "Monvoir",
+  "description": "Интернет-магазин мужской одежды",
   "logo": "/config/logo.svg",
   "currency": {
-    "symbol": "₽",
-    "code": "RUB",
+    "symbol": "UZS",
+    "code": "UZS",
     "position": "after"
   },
-  "managerContact": "@flowery_b1oom",
+  "managerContact": "@gayupov_a",
   "colorScheme": {
     "background": "#FEFEFE",
     "foreground": "#1A1A1A",
