@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useConfig } from "@/hooks/useConfig";
 
 interface OrderItem {
   name: string;
@@ -21,6 +22,8 @@ export default function OrderModal({
   onClose,
   onOrderComplete,
 }: OrderModalProps) {
+  const { config, formatPrice } = useConfig();
+  
   if (!isOpen) return null;
 
   const handleConfirm = () => {
@@ -38,19 +41,19 @@ export default function OrderModal({
         <div className="space-y-2 mb-4">
           {items.map((item, index) => (
             <div key={index} className="text-sm" data-testid={`text-order-item-${index}`}>
-              • {item.name} — {item.quantity} шт. — {item.price.toLocaleString()} сум
+              • {item.name} — {item.quantity} шт. — {formatPrice(item.price)}
             </div>
           ))}
         </div>
 
         <div className="border-t border-border pt-3 mb-4">
           <div className="font-semibold" data-testid="text-order-total">
-            Итого: {total.toLocaleString()} сум
+            Итого: {formatPrice(total)}
           </div>
         </div>
 
         <p className="text-sm text-muted-foreground mb-6">
-          Наш менеджер <span className="text-primary">@flowery_b1oom</span> свяжется с вами для оформления.
+          Наш менеджер <span className="text-primary">{config?.managerContact}</span> свяжется с вами для оформления.
         </p>
 
         <Button
