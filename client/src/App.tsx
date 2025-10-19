@@ -10,6 +10,7 @@ import Home from "@/pages/Home";
 import Cart from "@/pages/Cart";
 import Favorites from "@/pages/Favorites";
 import Product from "@/pages/Product";
+import ThemeApplier from "@/components/ThemeApplier";
 
 type Page = 'home' | 'cart' | 'favorites' | 'product';
 
@@ -165,6 +166,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <TelegramProvider>
+          <ThemeApplier />
           <AppContent />
           <Toaster />
         </TelegramProvider>

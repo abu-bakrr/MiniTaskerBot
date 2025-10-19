@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useConfig } from "@/hooks/useConfig";
 
 interface FilterBarProps {
   categories?: { id: string; name: string; icon: string }[];
@@ -33,11 +34,12 @@ export default function FilterBar({
   onPriceToChange,
   onReset,
 }: FilterBarProps) {
-  const sortOptions = [
-    { value: "new", label: "Новые" },
-    { value: "old", label: "Старые" },
-    { value: "price-asc", label: "Дешевле" },
-    { value: "price-desc", label: "Дороже" },
+  const { config } = useConfig();
+  
+  const sortOptions = config?.sortOptions || [
+    { id: "new", label: "Новые", emoji: "✨" },
+    { id: "price_asc", label: "Дешевле", emoji: "💰" },
+    { id: "price_desc", label: "Дороже", emoji: "💎" },
   ];
 
   const hasActiveFilters = selectedCategory !== "all" || priceFrom !== "" || priceTo !== "" || selectedSort !== "new";
@@ -102,8 +104,8 @@ export default function FilterBar({
               </SelectTrigger>
               <SelectContent side="bottom" align="center" position="popper">
                 {sortOptions.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
+                  <SelectItem key={opt.id} value={opt.id}>
+                    {opt.emoji} {opt.label}
                   </SelectItem>
                 ))}
               </SelectContent>
