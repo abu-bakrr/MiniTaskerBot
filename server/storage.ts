@@ -22,10 +22,10 @@ export class MemStorage implements IStorage {
     
     // Initialize with default categories
     const defaultCategories: InsertCategory[] = [
-      { name: 'Розы', icon: '🌹' },
-      { name: 'Тюльпаны', icon: '🌷' },
-      { name: 'Букеты', icon: '💐' },
-      { name: 'Пионы', icon: '🏵️' },
+      { name: 'Category 1', icon: '📦' },
+      { name: 'Category 2', icon: '🏷️' },
+      { name: 'Category 3', icon: '✨' },
+      { name: 'Category 4', icon: '🎁' },
     ];
     
     defaultCategories.forEach(cat => {

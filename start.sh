@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Starting Flowery Bloom application..."
+echo "Starting E-Commerce application..."
 
 # Seed database
 echo "Seeding database..."

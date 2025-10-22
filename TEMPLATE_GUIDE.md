@@ -125,15 +125,15 @@ config/
 Товары и категории хранятся в PostgreSQL базе данных:
 
 ### Категории
-Добавьте свои категории через API или напрямую в БД:
+Add your categories via API or directly in the database:
 ```sql
-INSERT INTO categories (name, icon) VALUES ('Розы', '🌹');
+INSERT INTO categories (name, icon) VALUES ('Category Name', '📦');
 ```
 
 ### Товары
 ```sql
 INSERT INTO products (name, description, price, images, category_id) 
-VALUES ('Букет роз', 'Красивый букет', 5000, ARRAY['url1.jpg', 'url2.jpg'], 'category-id');
+VALUES ('Product Name', 'Product description', 5000, ARRAY['url1.jpg', 'url2.jpg'], 'category-id');
 ```
 
 ## 🚀 Быстрый старт
@@ -152,7 +152,7 @@ VALUES ('Букет роз', 'Красивый букет', 5000, ARRAY['url1.jp
   "shopName": "Fashion Store",
   "currency": { "symbol": "$", "code": "USD", "position": "before" },
   "colorScheme": {
-    "primary": "#FF6B9D",  // Розовый
+    "primary": "#FF6B9D",  // Pink accent
     "accent": "#C44569"
   },
   "sortOptions": [
@@ -168,7 +168,7 @@ VALUES ('Букет роз', 'Красивый букет', 5000, ARRAY['url1.jp
   "shopName": "TechHub",
   "currency": { "symbol": "€", "code": "EUR", "position": "after" },
   "colorScheme": {
-    "primary": "#2C3E50",  // Темно-синий
+    "primary": "#2C3E50",  // Dark blue
     "accent": "#3498DB"
   },
   "sortOptions": [
