@@ -80,7 +80,7 @@ export default function FilterBar({
                 placeholder="От"
                 value={priceFrom}
                 onChange={(e) => onPriceFromChange?.(e.target.value)}
-                className="w-20 px-2 py-1 text-sm border border-border rounded-md bg-background"
+                className="w-20 h-8 px-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 data-testid="input-price-from"
               />
               <span className="text-muted-foreground">-</span>
@@ -89,7 +89,7 @@ export default function FilterBar({
                 placeholder="До"
                 value={priceTo}
                 onChange={(e) => onPriceToChange?.(e.target.value)}
-                className="w-20 px-2 py-1 text-sm border border-border rounded-md bg-background"
+                className="w-20 h-8 px-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 data-testid="input-price-to"
               />
             </div>
