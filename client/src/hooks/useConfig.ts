@@ -10,6 +10,11 @@ export interface AppConfig {
     position: "before" | "after";
   };
   managerContact: string;
+  categories: Array<{
+    id: string;
+    name: string;
+    icon?: string;
+  }>;
   colorScheme: {
     background: string;
     foreground: string;
