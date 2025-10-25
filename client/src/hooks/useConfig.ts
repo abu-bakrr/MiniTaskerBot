@@ -30,7 +30,7 @@ export interface AppConfig {
   sortOptions: Array<{
     id: string;
     label: string;
-    emoji: string;
+    emoji?: string;
   }>;
   ui: {
     maxWidth: string;

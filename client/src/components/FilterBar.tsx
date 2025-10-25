@@ -10,7 +10,7 @@ import {
 import { useConfig } from "@/hooks/useConfig";
 
 interface FilterBarProps {
-  categories?: { id: string; name: string; icon: string }[];
+  categories?: { id: string; name: string; icon?: string }[];
   selectedCategory?: string;
   selectedSort?: string;
   priceFrom?: string;
@@ -68,7 +68,7 @@ export default function FilterBar({
                 className="rounded-full whitespace-nowrap gap-1"
                 data-testid={`filter-category-${cat.id}`}
               >
-                <span>{cat.icon}</span>
+                {cat.icon && <span>{cat.icon}</span>}
                 <span>{cat.name}</span>
               </Button>
             ))}
@@ -105,7 +105,8 @@ export default function FilterBar({
               <SelectContent side="bottom" align="center" position="popper">
                 {sortOptions.map((opt) => (
                   <SelectItem key={opt.id} value={opt.id}>
-                    {opt.emoji} {opt.label}
+                    {opt.emoji && <span>{opt.emoji} </span>}
+                    {opt.label}
                   </SelectItem>
                 ))}
               </SelectContent>
