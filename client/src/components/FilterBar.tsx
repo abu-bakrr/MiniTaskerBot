@@ -102,7 +102,7 @@ export default function FilterBar({
               >
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent side="bottom" align="center" position="popper">
+              <SelectContent align="end" sideOffset={4}>
                 {sortOptions.map((opt) => (
                   <SelectItem key={opt.id} value={opt.id}>
                     {opt.emoji && <span>{opt.emoji} </span>}
