@@ -94,10 +94,14 @@ def init_db():
 def get_config():
     try:
         import json
+        from flask import Response
         config_path = os.path.join(os.path.dirname(__file__), 'config', 'settings.json')
         with open(config_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
-        return jsonify(config)
+        return Response(
+            json.dumps(config, ensure_ascii=False),
+            mimetype='application/json; charset=utf-8'
+        )
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
