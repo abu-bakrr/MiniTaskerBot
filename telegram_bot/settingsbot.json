@@ -1,0 +1,28 @@
+{
+  "authorized_users": [
+    
+  ],
+  "admin_notes": "Добавьте ваш Telegram ID в массив authorized_users. Пример: [123456789, 987654321]",
+  "categories": [
+    {
+      "id": "category-1",
+      "name": "Головной убор"
+    },
+    {
+      "id": "category-2",
+      "name": "Верхняя одежда"
+    },
+    {
+      "id": "category-3",
+      "name": "Нижняя одежда"
+    },
+    {
+      "id": "category-4",
+      "name": "Обувь"
+    },
+    {
+      "id": "category-5",
+      "name": "Образ"
+    }
+  ]
+}
