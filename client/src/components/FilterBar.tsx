@@ -107,7 +107,7 @@ export default function FilterBar({
                     e.preventDefault();
                   }
                 }}
-                className="w-20 h-8 px-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-20 h-8 px-2 text-sm border border-border rounded-md bg-background focus:outline-none"
                 data-testid="input-price-from"
               />
               <span className="text-muted-foreground">-</span>
@@ -126,7 +126,7 @@ export default function FilterBar({
                     e.preventDefault();
                   }
                 }}
-                className="w-20 h-8 px-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-20 h-8 px-2 text-sm border border-border rounded-md bg-background focus:outline-none"
                 data-testid="input-price-to"
               />
             </div>
@@ -134,7 +134,7 @@ export default function FilterBar({
             {/* Sort with Shadcn Select */}
             <Select value={selectedSort} onValueChange={onSortChange}>
               <SelectTrigger 
-                className="w-[110px] h-8 rounded-full text-sm ml-2 focus:outline-none focus:ring-2 focus:ring-ring" 
+                className="w-[110px] h-8 rounded-full text-sm ml-2 focus:outline-none" 
                 data-testid="filter-sort"
               >
                 <SelectValue />
