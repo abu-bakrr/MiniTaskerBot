@@ -7,6 +7,10 @@ import os
 import json
 import telebot
 from telebot import types
+import cloudinary
+import cloudinary.uploader
+import requests
+from io import BytesIO
 from db_operations import (
     add_product, 
     delete_product, 
@@ -32,8 +36,55 @@ class ProductBot:
         self.user_states = {}  # Хранение состояний пользователей
         self.temp_data = {}    # Временные данные для создания товаров
         
+        # Настройка Cloudinary
+        self._setup_cloudinary()
+        
         # Регистрация обработчиков
         self._register_handlers()
+    
+    def _setup_cloudinary(self):
+        """Настраивает Cloudinary используя переменные окружения"""
+        try:
+            cloudinary.config(
+                cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+                api_key=os.getenv('CLOUDINARY_API_KEY'),
+                api_secret=os.getenv('CLOUDINARY_API_SECRET')
+            )
+            print("✅ Cloudinary настроен успешно")
+        except Exception as e:
+            print(f"⚠️ Ошибка настройки Cloudinary: {e}")
+    
+    def _upload_photo_to_cloudinary(self, file_id):
+        """
+        Загружает фото из Telegram в Cloudinary
+        
+        Args:
+            file_id (str): Telegram file ID
+            
+        Returns:
+            str: URL загруженного изображения или None при ошибке
+        """
+        try:
+            # Получаем информацию о файле
+            file_info = self.bot.get_file(file_id)
+            file_url = f"https://api.telegram.org/file/bot{self.bot.token}/{file_info.file_path}"
+            
+            # Скачиваем файл
+            response = requests.get(file_url)
+            if response.status_code != 200:
+                print(f"❌ Ошибка скачивания фото: {response.status_code}")
+                return None
+            
+            # Загружаем в Cloudinary
+            upload_result = cloudinary.uploader.upload(
+                BytesIO(response.content),
+                folder="telegram_shop_products"
+            )
+            
+            return upload_result.get('secure_url')
+        except Exception as e:
+            print(f"❌ Ошибка загрузки в Cloudinary: {e}")
+            return None
     
     def _load_authorized_users(self):
         """Загружает список авторизованных пользователей из settingsbot.json"""
@@ -195,7 +246,7 @@ class ProductBot:
             response = "📁 <b>Категории товаров:</b>\n\n"
             
             for cat in categories:
-                response += f"{cat['icon']} <b>{cat['name']}</b>\n"
+                response += f"<b>{cat['name']}</b>\n"
                 response += f"   🆔 ID: <code>{cat['id']}</code>\n\n"
             
             self.bot.send_message(
@@ -250,6 +301,77 @@ class ProductBot:
             else:
                 self.bot.answer_callback_query(call.id, "❌ Ошибка удаления")
         
+        # Обработчик фотографий
+        @self.bot.message_handler(content_types=['photo'])
+        def handle_photo(message):
+            """Обработка получения фото от пользователя"""
+            user_id = message.from_user.id
+            
+            if not self._is_authorized(user_id):
+                self.bot.send_message(message.chat.id, "❌ Доступ запрещен")
+                return
+            
+            # Проверяем, находится ли пользователь в состоянии ожидания фото
+            user_state = self.user_states.get(user_id)
+            if user_state != "awaiting_images":
+                return
+            
+            # Проверяем лимит фото (безопасно через .get())
+            user_temp = self.temp_data.get(user_id)
+            if not user_temp:
+                return
+            
+            current_images = user_temp.get('images', [])
+            if len(current_images) >= 9:
+                self.bot.send_message(
+                    message.chat.id,
+                    "⚠️ Достигнут лимит в 9 фотографий.\n"
+                    "Нажмите '✅ Готово' чтобы завершить добавление товара."
+                )
+                return
+            
+            # Получаем самое большое фото
+            photo = message.photo[-1]
+            
+            # Отправляем статус загрузки
+            status_msg = self.bot.send_message(
+                message.chat.id,
+                f"⏳ Загружаю фото {len(current_images) + 1}/9..."
+            )
+            
+            # Загружаем фото в Cloudinary
+            photo_url = self._upload_photo_to_cloudinary(photo.file_id)
+            
+            # Повторно проверяем состояние после загрузки
+            # (могли нажать "Готово" или "Отмена" пока фото загружалось)
+            user_temp_after = self.temp_data.get(user_id)
+            user_state_after = self.user_states.get(user_id)
+            
+            if not user_temp_after or user_state_after != "awaiting_images":
+                # Пользователь уже завершил процесс, игнорируем результат загрузки
+                try:
+                    self.bot.delete_message(message.chat.id, status_msg.message_id)
+                except:
+                    pass
+                return
+            
+            if photo_url:
+                # Добавляем URL в список (безопасно, т.к. проверили выше)
+                user_temp_after['images'].append(photo_url)
+                
+                self.bot.edit_message_text(
+                    f"✅ Фото {len(user_temp_after['images'])}/9 загружено успешно!\n\n"
+                    f"Отправьте еще фото или нажмите '✅ Готово'",
+                    message.chat.id,
+                    status_msg.message_id
+                )
+            else:
+                self.bot.edit_message_text(
+                    "❌ Ошибка загрузки фото. Попробуйте еще раз.",
+                    message.chat.id,
+                    status_msg.message_id
+                )
+        
         # Обработчик состояний для добавления товара
         @self.bot.message_handler(func=lambda message: message.from_user.id in self.user_states)
         def handle_states(message):
@@ -291,7 +413,7 @@ class ProductBot:
                     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
                     
                     for cat in categories:
-                        markup.add(types.KeyboardButton(f"{cat['icon']} {cat['name']}"))
+                        markup.add(types.KeyboardButton(cat['name']))
                     markup.add(types.KeyboardButton("❌ Отмена"))
                     
                     self.bot.send_message(
@@ -311,7 +433,7 @@ class ProductBot:
                 selected_category = None
                 
                 for cat in categories:
-                    if f"{cat['icon']} {cat['name']}" == message.text:
+                    if cat['name'] == message.text:
                         selected_category = cat
                         break
                 
@@ -323,19 +445,19 @@ class ProductBot:
                     return
                 
                 self.temp_data[user_id]['category_id'] = selected_category['id']
+                self.temp_data[user_id]['images'] = []  # Инициализируем список для фото
                 self.user_states[user_id] = "awaiting_images"
                 
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+                markup.add(types.KeyboardButton("✅ Готово"))
                 markup.add(types.KeyboardButton("⏭ Пропустить (без фото)"))
                 markup.add(types.KeyboardButton("❌ Отмена"))
                 
                 self.bot.send_message(
                     message.chat.id,
-                    "📸 Отправьте ссылки на изображения товара.\n\n"
-                    "Формат: одна ссылка на строку\n"
-                    "Например:\n"
-                    "https://example.com/image1.jpg\n"
-                    "https://example.com/image2.jpg\n\n"
+                    "📸 Отправьте фотографии товара (до 9 штук).\n\n"
+                    "Отправляйте по одному фото.\n"
+                    "После загрузки всех фото нажмите '✅ Готово'\n\n"
                     "Или нажмите '⏭ Пропустить' чтобы добавить товар без изображений.",
                     reply_markup=markup
                 )
@@ -343,9 +465,13 @@ class ProductBot:
             elif state == "awaiting_images":
                 if message.text == "⏭ Пропустить (без фото)":
                     images = ["https://via.placeholder.com/400x400?text=No+Image"]
+                elif message.text == "✅ Готово":
+                    images = self.temp_data[user_id].get('images', [])
+                    if not images:
+                        images = ["https://via.placeholder.com/400x400?text=No+Image"]
                 else:
-                    # Парсим ссылки
-                    images = [line.strip() for line in message.text.split('\n') if line.strip()]
+                    # Игнорируем текстовые сообщения в этом состоянии
+                    return
                 
                 # Сохраняем товар в БД
                 product = add_product(
@@ -364,6 +490,7 @@ class ProductBot:
                         f"📝 Описание: {product['description']}\n"
                         f"💰 Цена: {product['price']:,} сум\n"
                         f"📁 Категория: {self.temp_data[user_id]['category_id']}\n"
+                        f"📸 Фотографий: {len(images)}\n"
                         f"🆔 ID: <code>{product['id']}</code>",
                         parse_mode='HTML',
                         reply_markup=self._create_main_menu()

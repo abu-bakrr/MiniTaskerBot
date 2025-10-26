@@ -43,15 +43,21 @@ def get_config():
 
 def get_categories_from_config():
     """
-    Gets categories from config file (categories are now stored in config, not database)
+    Gets categories from settingsbot.json file
     
     Returns:
         list: Array of category dictionaries or empty array if error
     """
-    config = get_config()
-    if config and 'categories' in config:
-        return config['categories']
-    return []
+    try:
+        with open('settingsbot.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            return data.get('categories', [])
+    except FileNotFoundError:
+        print("⚠️ Файл settingsbot.json не найден.")
+        return []
+    except Exception as e:
+        print(f"❌ Ошибка загрузки категорий: {e}")
+        return []
 
 
 def add_product(name, description, price, images, category_id=None):
