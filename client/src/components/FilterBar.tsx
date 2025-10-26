@@ -96,8 +96,18 @@ export default function FilterBar({
                 type="number"
                 placeholder="От"
                 value={priceFrom}
-                onChange={(e) => onPriceFromChange?.(e.target.value)}
-                className="w-20 h-8 px-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '' || /^\d+$/.test(value)) {
+                    onPriceFromChange?.(value);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E' || e.key === '.') {
+                    e.preventDefault();
+                  }
+                }}
+                className="w-20 h-8 px-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                 data-testid="input-price-from"
               />
               <span className="text-muted-foreground">-</span>
@@ -105,8 +115,18 @@ export default function FilterBar({
                 type="number"
                 placeholder="До"
                 value={priceTo}
-                onChange={(e) => onPriceToChange?.(e.target.value)}
-                className="w-20 h-8 px-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '' || /^\d+$/.test(value)) {
+                    onPriceToChange?.(value);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E' || e.key === '.') {
+                    e.preventDefault();
+                  }
+                }}
+                className="w-20 h-8 px-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                 data-testid="input-price-to"
               />
             </div>
@@ -114,7 +134,7 @@ export default function FilterBar({
             {/* Sort with Shadcn Select */}
             <Select value={selectedSort} onValueChange={onSortChange}>
               <SelectTrigger 
-                className="w-[110px] h-8 rounded-full text-sm ml-2" 
+                className="w-[110px] h-8 rounded-full text-sm ml-2 focus:outline-none focus:ring-2 focus:ring-ring" 
                 data-testid="filter-sort"
               >
                 <SelectValue />
