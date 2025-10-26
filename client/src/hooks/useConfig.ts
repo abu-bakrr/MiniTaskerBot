@@ -52,6 +52,20 @@ export interface AppConfig {
     emptyFavorites: string;
     loading: string;
   };
+  fonts?: {
+    fontFamily: string;
+    fontFile: string | null;
+    productName: {
+      weight: number;
+    };
+    price: {
+      weight: number;
+    };
+    description: {
+      weight: number;
+    };
+  };
+  logoSize?: number;
 }
 
 export function useConfig() {

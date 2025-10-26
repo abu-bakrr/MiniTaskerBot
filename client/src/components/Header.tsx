@@ -16,6 +16,7 @@ export default function Header({
   cartCount = 0 
 }: HeaderProps) {
   const { config } = useConfig();
+  const logoSize = config?.logoSize || 32;
 
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border px-4 py-3" data-testid="header-main">
@@ -25,7 +26,8 @@ export default function Header({
             <img 
               src={config.logo} 
               alt="Logo" 
-              className="w-8 h-8 object-contain"
+              style={{ width: `${logoSize}px`, height: 'auto' }}
+              className="object-contain"
             />
           )}
           <h1 className="text-lg font-semibold text-foreground" data-testid="text-brand-name">

@@ -11,6 +11,7 @@ import Cart from "@/pages/Cart";
 import Favorites from "@/pages/Favorites";
 import Product from "@/pages/Product";
 import ThemeApplier from "@/components/ThemeApplier";
+import FontLoader from "@/components/FontLoader";
 
 type Page = 'home' | 'cart' | 'favorites' | 'product';
 
@@ -167,6 +168,7 @@ function App() {
       <TooltipProvider>
         <TelegramProvider>
           <ThemeApplier />
+          <FontLoader />
           <AppContent />
           <Toaster />
         </TelegramProvider>

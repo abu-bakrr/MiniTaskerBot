@@ -172,11 +172,25 @@ export default function ProductCard({
       </div>
       
       <div className="p-3">
-        <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-1" data-testid={`text-product-name-${id}`}>
+        <h3 
+          className="text-sm text-foreground line-clamp-2 mb-1" 
+          style={{ 
+            fontFamily: 'var(--font-family-custom, Inter)',
+            fontWeight: 'var(--font-weight-product-name, 500)'
+          }}
+          data-testid={`text-product-name-${id}`}
+        >
           {name}
         </h3>
         <div className="flex items-center justify-between">
-          <p className="text-base font-semibold text-foreground" data-testid={`text-product-price-${id}`}>
+          <p 
+            className="text-base text-foreground" 
+            style={{ 
+              fontFamily: 'var(--font-family-custom, Inter)',
+              fontWeight: 'var(--font-weight-price, 600)'
+            }}
+            data-testid={`text-product-price-${id}`}
+          >
             {formatPrice(price)}
           </p>
           <Button

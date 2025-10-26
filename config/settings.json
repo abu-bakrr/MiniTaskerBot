@@ -75,5 +75,19 @@
     "emptyCart": "Корзина пуста",
     "emptyFavorites": "Нет избранных товаров",
     "loading": "Загрузка..."
-  }
+  },
+  "fonts": {
+    "fontFamily": "Inter",
+    "fontFile": null,
+    "productName": {
+      "weight": 500
+    },
+    "price": {
+      "weight": 600
+    },
+    "description": {
+      "weight": 400
+    }
+  },
+  "logoSize": 32
 }

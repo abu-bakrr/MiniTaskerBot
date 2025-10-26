@@ -176,17 +176,38 @@ export default function ProductDetail({
         {/* Product Info */}
         <div className="px-4 space-y-4">
           <div>
-            <h1 className="text-2xl font-bold mb-2" data-testid="text-product-detail-name">
+            <h1 
+              className="text-2xl mb-2" 
+              style={{ 
+                fontFamily: 'var(--font-family-custom, Inter)',
+                fontWeight: 'var(--font-weight-product-name, 500)'
+              }}
+              data-testid="text-product-detail-name"
+            >
               {name}
             </h1>
-            <p className="text-3xl font-bold text-foreground" data-testid="text-product-detail-price">
+            <p 
+              className="text-3xl text-foreground" 
+              style={{ 
+                fontFamily: 'var(--font-family-custom, Inter)',
+                fontWeight: 'var(--font-weight-price, 600)'
+              }}
+              data-testid="text-product-detail-price"
+            >
               {formatPrice(price)}
             </p>
           </div>
 
           <div className="border-t pt-4">
             <h3 className="text-sm font-semibold mb-2">Описание</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed" data-testid="text-product-description">
+            <p 
+              className="text-sm text-muted-foreground leading-relaxed" 
+              style={{ 
+                fontFamily: 'var(--font-family-custom, Inter)',
+                fontWeight: 'var(--font-weight-description, 400)'
+              }}
+              data-testid="text-product-description"
+            >
               {description}
             </p>
           </div>
