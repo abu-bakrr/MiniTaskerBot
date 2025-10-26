@@ -12,7 +12,13 @@ This is a **universal template** for creating e-commerce Telegram Mini Apps. The
 
 ## Recent Changes
 
-### October 19, 2025 (Latest) - Template Conversion
+### October 26, 2025 (Latest) - Custom Fonts and Logo Sizing
+- **Custom Fonts**: Added support for custom font files with configurable font-family and font-weight
+- **Typography Control**: Separate font-weight settings for product names, prices, and descriptions
+- **Dynamic Logo Sizing**: Configurable logo size with automatic proportion preservation
+- **FontLoader Component**: Automatic @font-face injection for custom fonts with CSS variable system
+
+### October 19, 2025 - Template Conversion
 - **Universal Template**: Converted flower shop into configurable template for any e-commerce business
 - **Configuration System**: Created `config/` folder with `settings.json` for all shop settings
 - **Dynamic Branding**: Shop name, logo, and colors now loaded from config
@@ -64,7 +70,15 @@ All shop settings are centralized in `config/settings.json`:
     "addToCart": "Add to Cart",
     "checkout": "Checkout",
     // ... more texts
-  }
+  },
+  "fonts": {
+    "fontFamily": "Inter",
+    "fontFile": null,
+    "productName": { "weight": 500 },
+    "price": { "weight": 600 },
+    "description": { "weight": 400 }
+  },
+  "logoSize": 32
 }
 ```
 
@@ -82,9 +96,11 @@ All shop settings are centralized in `config/settings.json`:
 **Key Features:**
 - `useConfig` hook: Loads and provides configuration throughout the app
 - `ThemeApplier` component: Dynamically applies color scheme from config
+- `FontLoader` component: Loads custom fonts and applies typography settings
 - `formatPrice` utility: Formats prices according to currency settings
 - Dynamic sort options from configuration
 - Configurable UI texts and labels
+- Custom font support with weight controls
 
 ### Backend Architecture
 
@@ -123,6 +139,8 @@ Edit `config/settings.json`:
 - Configure currency (symbol, code, position)
 - Set manager Telegram contact
 - Customize color scheme (all colors in HEX format)
+- Set logo size in pixels (default: 32)
+- Configure typography (font family, custom font file, weights)
 - Define sort options with emojis
 - Adjust UI settings and texts
 
