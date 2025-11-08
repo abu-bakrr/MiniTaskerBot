@@ -56,6 +56,11 @@ echo ""
 
 read -p "Введите имя пользователя для приложения [shopapp]: " APP_USER
 APP_USER=${APP_USER:-shopapp}
+# Валидация имени пользователя
+if [[ ! "$APP_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
+    print_error "Некорректное имя пользователя. Используется значение по умолчанию: shopapp"
+    APP_USER="shopapp"
+fi
 
 read -p "Введите имя базы данных [shop_db]: " DB_NAME
 DB_NAME=${DB_NAME:-shop_db}
@@ -65,6 +70,12 @@ DB_USER=${DB_USER:-shop_user}
 
 read -sp "Введите пароль для БД: " DB_PASSWORD
 echo
+# Проверка пароля
+if [ -z "$DB_PASSWORD" ]; then
+    print_error "Пароль не может быть пустым!"
+    read -sp "Введите пароль для БД ещё раз: " DB_PASSWORD
+    echo
+fi
 
 read -p "Введите порт для приложения [5000]: " APP_PORT
 APP_PORT=${APP_PORT:-5000}
@@ -87,12 +98,20 @@ else
 fi
 
 # Создание пользователя приложения
-print_step "Создание пользователя приложения..."
+print_step "Создание пользователя приложения: $APP_USER"
 if id "$APP_USER" &>/dev/null; then
     print_warning "Пользователь $APP_USER уже существует"
 else
-    adduser --disabled-password --gecos "" $APP_USER
-    print_step "Пользователь $APP_USER создан"
+    # Создаём пользователя с автоматическими ответами
+    adduser --disabled-password --gecos "" --quiet $APP_USER 2>/dev/null || \
+    useradd -m -s /bin/bash $APP_USER
+    
+    if id "$APP_USER" &>/dev/null; then
+        print_step "Пользователь $APP_USER создан"
+    else
+        print_error "Не удалось создать пользователя $APP_USER"
+        exit 1
+    fi
 fi
 
 # Добавление пользователя в группу www-data для работы с Nginx
