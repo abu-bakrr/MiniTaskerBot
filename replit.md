@@ -34,26 +34,49 @@ This is a **universal template** for creating e-commerce Telegram Mini Apps. The
 - **Telegram Mini App Database Integration**: Updated database schema for full Telegram authentication support
 
 ### November 8, 2025 - VPS Deployment Improvements
-- **Auto-fix Permissions**: `deploy_vps.sh` now automatically configures Nginx permissions
+- **GitHub Integration**: `deploy_vps.sh` now supports direct cloning from GitHub
+- **One-Command Deploy**: Download and run deployment script directly from GitHub
+- **Auto-fix Permissions**: `deploy_vps.sh` automatically configures Nginx permissions
 - **New Script**: `fix_permissions.sh` for quick resolution of 403 Forbidden errors
-- **Updated Scripts**: All deployment scripts now handle permissions correctly
-- **Enhanced Documentation**: Added comprehensive VPS deployment guides in Russian
+- **Enhanced Documentation**: Added `GITHUB_QUICK_START.md` for fastest deployment
+- **Flexible Source**: Support for both GitHub and local file deployment
 
 ## 🚀 VPS Deployment Quick Start
 
-### Deploy in 2 Commands
+### Deploy in 1 Command from GitHub! ⚡
 
 ```bash
-# 1. Clone repository on VPS
-git clone <your-repo> /opt/shop-deploy
-cd /opt/shop-deploy
+# Connect to VPS
+ssh root@YOUR_VPS_IP
 
-# 2. Run auto-deployment
+# Download and run deployment script
+wget https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/deploy_vps.sh
 chmod +x deploy_vps.sh
 sudo ./deploy_vps.sh
 ```
 
-**Done!** The script automatically installs PostgreSQL, Nginx, Node.js, builds frontend, and configures everything.
+When prompted, enter your GitHub repository URL:
+```
+https://github.com/YOUR_USERNAME/YOUR_REPO.git
+```
+
+**Done!** The script automatically:
+- ✅ Clones your repository from GitHub
+- ✅ Installs PostgreSQL, Nginx, Node.js
+- ✅ Builds frontend
+- ✅ Configures everything and starts the app
+
+**Alternative - Clone first, then deploy:**
+
+```bash
+# 1. Clone repository on VPS
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git /opt/shop-deploy
+cd /opt/shop-deploy
+
+# 2. Run auto-deployment (leave GitHub URL empty to use local files)
+chmod +x deploy_vps.sh
+sudo ./deploy_vps.sh
+```
 
 ### Available Scripts
 
@@ -67,11 +90,12 @@ sudo ./deploy_vps.sh
 
 ### VPS Documentation
 
-- 📘 **Quick Start (RU)**: `QUICK_START_RU.md` ⭐
+- ⚡ **GitHub Quick Start**: `GITHUB_QUICK_START.md` ⭐ (Fastest way!)
+- 📘 **Quick Start (RU)**: `QUICK_START_RU.md`
 - 🌐 **Domain & SSL Setup**: `DOMAIN_SETUP_RU.md`
 - 📗 **Full Guide**: `DEPLOY_TO_VPS_README.md`
 - 📕 **Scripts Reference**: `VPS_SCRIPTS_README.md`
-- 📙 **GitHub Deployment**: `DEPLOY_FROM_GITHUB.md`
+- 📙 **GitHub Deployment Details**: `DEPLOY_FROM_GITHUB.md`
 
 ## Template Configuration
 
