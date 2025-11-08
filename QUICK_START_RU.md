@@ -172,12 +172,12 @@ sudo ./update_vps.sh
 
 ```bash
 # Проверьте статус
-systemctl status monvoir-app
+systemctl status shop-app
 systemctl status nginx
 
 # Посмотрите логи
-journalctl -u monvoir-app -n 50
-tail -f /var/log/nginx/monvoir_error.log
+journalctl -u shop-app -n 50
+tail -f /var/log/nginx/shop_error.log
 ```
 
 ### Белая страница / Ошибки 403 Forbidden
@@ -186,7 +186,7 @@ tail -f /var/log/nginx/monvoir_error.log
 
 ```bash
 # Автоматическое исправление прав доступа
-cd /home/monvoir/app
+cd /home/shopapp/app
 sudo ./fix_permissions.sh
 ```
 
@@ -199,7 +199,7 @@ sudo ./fix_permissions.sh
 systemctl status postgresql
 
 # Проверьте настройки
-cat /home/monvoir/app/.env
+cat /home/shopapp/app/.env
 ```
 
 ### Нужна помощь?

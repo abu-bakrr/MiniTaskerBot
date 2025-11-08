@@ -1,7 +1,7 @@
 # 🚀 Инструкция по развертыванию на VPS Ubuntu 22.04
 
 ## Информация о VPS
-- **IP**: 81.162.55.47
+- **IP**: YOUR_VPS_IP
 - **ОС**: Ubuntu 22.04
 - **База данных**: PostgreSQL (локально на VPS)
 
@@ -11,7 +11,7 @@
 
 ```bash
 # Подключитесь к VPS по SSH
-ssh root@81.162.55.47
+ssh root@YOUR_VPS_IP
 
 # Обновите систему
 apt update && apt upgrade -y
@@ -29,9 +29,9 @@ apt install -y python3 python3-pip python3-venv nodejs npm postgresql postgresql
 sudo -u postgres psql
 
 # В psql выполните:
-CREATE DATABASE monvoir_shop;
-CREATE USER monvoir_user WITH PASSWORD 'ваш_надежный_пароль';
-GRANT ALL PRIVILEGES ON DATABASE monvoir_shop TO monvoir_user;
+CREATE DATABASE shop_db;
+CREATE USER shop_user WITH PASSWORD 'ваш_надежный_пароль';
+GRANT ALL PRIVILEGES ON DATABASE shop_db TO shop_user;
 \q
 
 # Разрешите локальные подключения
@@ -52,23 +52,23 @@ systemctl restart postgresql
 
 ```bash
 # Создайте пользователя для приложения (опционально, но рекомендуется)
-adduser --disabled-password --gecos "" monvoir
-usermod -aG sudo monvoir
+adduser --disabled-password --gecos "" shopapp
+usermod -aG sudo shopapp
 
 # Переключитесь на нового пользователя
-su - monvoir
+su - shopapp
 
 # Создайте директорию для приложения
-mkdir -p /home/monvoir/app
-cd /home/monvoir/app
+mkdir -p /home/shopapp/app
+cd /home/shopapp/app
 
 # Загрузите код приложения (один из вариантов):
 # Вариант 1: Клонирование из git (если у вас есть репозиторий)
-# git clone https://github.com/your-repo/monvoir-shop.git .
+# git clone https://github.com/your-repo/shop.git .
 
 # Вариант 2: Загрузка через SCP с вашего локального компьютера
 # На вашем локальном компьютере выполните:
-# scp -r /путь/к/проекту/* monvoir@81.162.55.47:/home/monvoir/app/
+# scp -r /путь/к/проекту/* shopapp@YOUR_VPS_IP:/home/shopapp/app/
 
 # Вариант 3: Загрузка из Replit
 # Можно использовать git или архив
@@ -80,10 +80,10 @@ cd /home/monvoir/app
 
 ```bash
 # Создайте файл .env в директории приложения
-nano /home/monvoir/app/.env
+nano /home/shopapp/app/.env
 
 # Добавьте следующие переменные:
-DATABASE_URL=postgresql://monvoir_user:ваш_надежный_пароль@localhost:5432/monvoir_shop
+DATABASE_URL=postgresql://shop_user:ваш_надежный_пароль@localhost:5432/shop_db
 PORT=5000
 FLASK_ENV=production
 ```
@@ -93,7 +93,7 @@ FLASK_ENV=production
 ## 📦 Шаг 5: Установка зависимостей и сборка
 
 ```bash
-cd /home/monvoir/app
+cd /home/shopapp/app
 
 # Установите Node.js зависимости
 npm install
@@ -124,25 +124,25 @@ python3 seed_db.py
 
 ```bash
 # Вернитесь к root или используйте sudo
-exit  # если вы были под пользователем monvoir
+exit  # если вы были под пользователем shopapp
 
 # Создайте systemd unit file для Flask приложения
-sudo nano /etc/systemd/system/monvoir-app.service
+sudo nano /etc/systemd/system/shop-app.service
 ```
 
 Содержимое файла:
 ```ini
 [Unit]
-Description=Monvoir Shop Flask Application
+Description=Telegram Shop Flask Application
 After=network.target postgresql.service
 
 [Service]
 Type=simple
-User=monvoir
-WorkingDirectory=/home/monvoir/app
-Environment="PATH=/home/monvoir/app/venv/bin"
-EnvironmentFile=/home/monvoir/app/.env
-ExecStart=/home/monvoir/app/venv/bin/gunicorn app:app --bind 127.0.0.1:5000 --workers 4 --timeout 120
+User=shopapp
+WorkingDirectory=/home/shopapp/app
+Environment="PATH=/home/shopapp/app/venv/bin"
+EnvironmentFile=/home/shopapp/app/.env
+ExecStart=/home/shopapp/app/venv/bin/gunicorn app:app --bind 127.0.0.1:5000 --workers 4 --timeout 120
 Restart=always
 RestartSec=10
 
@@ -153,11 +153,11 @@ WantedBy=multi-user.target
 ```bash
 # Перезагрузите systemd и запустите сервис
 sudo systemctl daemon-reload
-sudo systemctl enable monvoir-app
-sudo systemctl start monvoir-app
+sudo systemctl enable shop-app
+sudo systemctl start shop-app
 
 # Проверьте статус
-sudo systemctl status monvoir-app
+sudo systemctl status shop-app
 ```
 
 ---
@@ -166,31 +166,31 @@ sudo systemctl status monvoir-app
 
 ```bash
 # Создайте конфигурацию Nginx
-sudo nano /etc/nginx/sites-available/monvoir
+sudo nano /etc/nginx/sites-available/shop
 ```
 
 Содержимое файла:
 ```nginx
 server {
     listen 80;
-    server_name 81.162.55.47;
+    server_name YOUR_VPS_IP;
 
     # Максимальный размер загружаемых файлов
     client_max_body_size 20M;
 
     # Логи
-    access_log /var/log/nginx/monvoir_access.log;
-    error_log /var/log/nginx/monvoir_error.log;
+    access_log /var/log/nginx/shop_access.log;
+    error_log /var/log/nginx/shop_error.log;
 
     # Статические файлы
     location /assets {
-        alias /home/monvoir/app/dist/public/assets;
+        alias /home/shopapp/app/dist/public/assets;
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
 
     location /config {
-        alias /home/monvoir/app/config;
+        alias /home/shopapp/app/config;
         expires 1h;
         add_header Cache-Control "public";
     }
@@ -213,7 +213,7 @@ server {
 
 ```bash
 # Активируйте конфигурацию
-sudo ln -s /etc/nginx/sites-available/monvoir /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/shop /etc/nginx/sites-enabled/
 
 # Удалите дефолтную конфигурацию (опционально)
 sudo rm /etc/nginx/sites-enabled/default
@@ -251,22 +251,22 @@ sudo certbot renew --dry-run
 
 ```bash
 # Создайте systemd сервис для бота
-sudo nano /etc/systemd/system/monvoir-bot.service
+sudo nano /etc/systemd/system/shop-bot.service
 ```
 
 Содержимое файла:
 ```ini
 [Unit]
-Description=Monvoir Telegram Bot
+Description=Telegram Shop Bot
 After=network.target
 
 [Service]
 Type=simple
-User=monvoir
-WorkingDirectory=/home/monvoir/app
-Environment="PATH=/home/monvoir/app/venv/bin"
-EnvironmentFile=/home/monvoir/app/.env
-ExecStart=/home/monvoir/app/venv/bin/python3 telegrambot.py
+User=shopapp
+WorkingDirectory=/home/shopapp/app
+Environment="PATH=/home/shopapp/app/venv/bin"
+EnvironmentFile=/home/shopapp/app/.env
+ExecStart=/home/shopapp/app/venv/bin/python3 telegrambot.py
 Restart=always
 RestartSec=10
 
@@ -278,9 +278,9 @@ WantedBy=multi-user.target
 # Не забудьте добавить BOT_TOKEN в .env файл!
 # Затем запустите бот:
 sudo systemctl daemon-reload
-sudo systemctl enable monvoir-bot
-sudo systemctl start monvoir-bot
-sudo systemctl status monvoir-bot
+sudo systemctl enable shop-bot
+sudo systemctl start shop-bot
+sudo systemctl status shop-bot
 ```
 
 ---
@@ -309,16 +309,16 @@ sudo ufw status
 
 ```bash
 # Проверьте статус всех сервисов
-sudo systemctl status monvoir-app
+sudo systemctl status shop-app
 sudo systemctl status nginx
 sudo systemctl status postgresql
 
 # Проверьте логи
-sudo journalctl -u monvoir-app -f
-sudo tail -f /var/log/nginx/monvoir_error.log
+sudo journalctl -u shop-app -f
+sudo tail -f /var/log/nginx/shop_error.log
 
 # Откройте в браузере:
-# http://81.162.55.47
+# http://YOUR_VPS_IP
 ```
 
 ---
@@ -327,29 +327,29 @@ sudo tail -f /var/log/nginx/monvoir_error.log
 
 ```bash
 # Перезапуск приложения
-sudo systemctl restart monvoir-app
+sudo systemctl restart shop-app
 
 # Просмотр логов приложения
-sudo journalctl -u monvoir-app -f
+sudo journalctl -u shop-app -f
 
 # Просмотр логов Nginx
-sudo tail -f /var/log/nginx/monvoir_access.log
-sudo tail -f /var/log/nginx/monvoir_error.log
+sudo tail -f /var/log/nginx/shop_access.log
+sudo tail -f /var/log/nginx/shop_error.log
 
 # Обновление кода приложения
-cd /home/monvoir/app
+cd /home/shopapp/app
 git pull  # если используете git
 npm install
 npm run build
 source venv/bin/activate
 pip install -r requirements.txt
-sudo systemctl restart monvoir-app
+sudo systemctl restart shop-app
 
 # Резервное копирование базы данных
-sudo -u postgres pg_dump monvoir_shop > backup_$(date +%Y%m%d).sql
+sudo -u postgres pg_dump shop_db > backup_$(date +%Y%m%d).sql
 
 # Восстановление базы данных
-sudo -u postgres psql monvoir_shop < backup_20241107.sql
+sudo -u postgres psql shop_db < backup_20241107.sql
 ```
 
 ---
@@ -360,26 +360,26 @@ sudo -u postgres psql monvoir_shop < backup_20241107.sql
 
 ```bash
 # Проверьте логи
-sudo journalctl -u monvoir-app -n 100
+sudo journalctl -u shop-app -n 100
 
 # Проверьте права доступа
-ls -la /home/monvoir/app
+ls -la /home/shopapp/app
 
 # Проверьте подключение к БД
-psql -U monvoir_user -d monvoir_shop -h localhost
+psql -U shop_user -d shop_db -h localhost
 ```
 
 ### Nginx показывает 502 Bad Gateway
 
 ```bash
 # Проверьте, запущен ли Flask
-sudo systemctl status monvoir-app
+sudo systemctl status shop-app
 
 # Проверьте, слушает ли приложение на порту 5000
 sudo netstat -tulpn | grep 5000
 
 # Проверьте логи Nginx
-sudo tail -f /var/log/nginx/monvoir_error.log
+sudo tail -f /var/log/nginx/shop_error.log
 ```
 
 ### База данных не подключается
@@ -389,7 +389,7 @@ sudo tail -f /var/log/nginx/monvoir_error.log
 sudo systemctl status postgresql
 
 # Проверьте настройки подключения в .env
-cat /home/monvoir/app/.env
+cat /home/shopapp/app/.env
 
 # Проверьте pg_hba.conf
 sudo cat /etc/postgresql/14/main/pg_hba.conf
@@ -414,7 +414,7 @@ htop
 ## 🎉 Готово!
 
 Ваше приложение теперь развернуто на VPS и доступно по адресу:
-- **HTTP**: http://81.162.55.47
+- **HTTP**: http://YOUR_VPS_IP
 - **HTTPS** (если настроили SSL): https://yourdomain.com
 
 Все данные и база данных находятся локально на вашем VPS.

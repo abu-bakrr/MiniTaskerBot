@@ -125,26 +125,26 @@ git clone git@github.com:ваш-username/ваш-репозиторий.git shop-
 ### Как узнать, какая версия сейчас на сервере?
 
 ```bash
-ssh root@81.162.55.47
-cd /home/monvoir/app
+ssh root@YOUR_VPS_IP
+cd /home/shopapp/app
 git log -1 --pretty=format:"%h - %s (%cr)"
 ```
 
 ### Как откатить изменения, если что-то сломалось?
 
 ```bash
-ssh root@81.162.55.47
-cd /home/monvoir/app
+ssh root@YOUR_VPS_IP
+cd /home/shopapp/app
 
 # Посмотреть историю
 git log --oneline -10
 
 # Откатиться на нужный коммит (замените abc123)
-sudo -u monvoir git checkout abc123
+sudo -u shopapp git checkout abc123
 sudo ./update_vps.sh
 
 # Вернуться на последнюю версию
-sudo -u monvoir git checkout main
+sudo -u shopapp git checkout main
 sudo ./update_vps.sh
 ```
 
@@ -152,13 +152,13 @@ sudo ./update_vps.sh
 
 ```bash
 # Логи приложения
-journalctl -u monvoir-app -f
+journalctl -u shop-app -f
 
 # Логи Nginx
-tail -f /var/log/nginx/monvoir_error.log
+tail -f /var/log/nginx/shop_error.log
 
 # Статус всех сервисов
-systemctl status monvoir-app
+systemctl status shop-app
 systemctl status nginx
 systemctl status postgresql
 ```

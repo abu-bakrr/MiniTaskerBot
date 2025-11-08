@@ -5,7 +5,7 @@
 ### Шаг 1: Подключитесь к VPS
 
 ```bash
-ssh root@81.162.55.47
+ssh root@YOUR_VPS_IP
 ```
 
 ### Шаг 2: Клонируйте и запустите установку
@@ -13,10 +13,10 @@ ssh root@81.162.55.47
 ```bash
 # Клонируйте ваш репозиторий
 cd /opt
-git clone https://github.com/ваш-username/ваш-репозиторий.git monvoir-deploy
+git clone https://github.com/ваш-username/ваш-репозиторий.git shop-deploy
 
 # Перейдите в директорию
-cd monvoir-deploy
+cd shop-deploy
 
 # Запустите автоматическую установку
 chmod +x deploy_vps.sh
@@ -32,7 +32,7 @@ chmod +x deploy_vps.sh
 - ✅ Настроит Nginx
 - ✅ Запустит приложение
 
-После завершения откройте: **http://81.162.55.47**
+После завершения откройте: **http://YOUR_VPS_IP**
 
 ---
 
@@ -42,13 +42,13 @@ chmod +x deploy_vps.sh
 
 ```bash
 # Подключитесь к VPS
-ssh root@81.162.55.47
+ssh root@YOUR_VPS_IP
 
 # Перейдите в директорию приложения
-cd /home/monvoir/app
+cd /home/shopapp/app
 
 # Получите обновления из GitHub
-sudo -u monvoir git pull
+sudo -u shopapp git pull
 
 # Запустите скрипт обновления
 sudo ./update_vps.sh
@@ -70,7 +70,7 @@ sudo ./update_vps.sh
 
 ```bash
 # На VPS создайте SSH ключ
-ssh-keygen -t ed25519 -C "vps@monvoir"
+ssh-keygen -t ed25519 -C "vps@shop"
 
 # Выведите публичный ключ
 cat ~/.ssh/id_ed25519.pub
@@ -81,7 +81,7 @@ cat ~/.ssh/id_ed25519.pub
 
 Теперь клонируйте через SSH:
 ```bash
-git clone git@github.com:ваш-username/ваш-репозиторий.git monvoir-deploy
+git clone git@github.com:ваш-username/ваш-репозиторий.git shop-deploy
 ```
 
 ### Вариант 2: Personal Access Token
@@ -91,7 +91,7 @@ git clone git@github.com:ваш-username/ваш-репозиторий.git monvo
 # GitHub → Settings → Developer settings → Personal access tokens → Generate new token
 
 # Клонируйте с токеном:
-git clone https://ваш-токен@github.com/ваш-username/ваш-репозиторий.git monvoir-deploy
+git clone https://ваш-токен@github.com/ваш-username/ваш-репозиторий.git shop-deploy
 ```
 
 ---
@@ -121,12 +121,12 @@ git clone https://ваш-токен@github.com/ваш-username/ваш-репоз
 
 ```bash
 # Подключитесь к VPS
-ssh root@81.162.55.47
+ssh root@YOUR_VPS_IP
 
 # Клонируйте репозиторий
 cd /opt
-git clone https://github.com/ваш-username/ваш-репозиторий.git monvoir-deploy
-cd monvoir-deploy
+git clone https://github.com/ваш-username/ваш-репозиторий.git shop-deploy
+cd shop-deploy
 
 # Запустите установку
 chmod +x *.sh
@@ -145,9 +145,9 @@ git push
 
 # На VPS:
 # 3. Получите обновления и перезапустите
-ssh root@81.162.55.47
-cd /home/monvoir/app
-sudo -u monvoir git pull
+ssh root@YOUR_VPS_IP
+cd /home/shopapp/app
+sudo -u shopapp git pull
 sudo ./update_vps.sh
 ```
 
@@ -161,20 +161,20 @@ sudo ./update_vps.sh
 
 ```bash
 # На VPS создайте скрипт
-sudo nano /home/monvoir/webhook_update.sh
+sudo nano /home/shopapp/webhook_update.sh
 ```
 
 Содержимое:
 ```bash
 #!/bin/bash
-cd /home/monvoir/app
-sudo -u monvoir git pull
-/home/monvoir/app/update_vps.sh
+cd /home/shopapp/app
+sudo -u shopapp git pull
+/home/shopapp/app/update_vps.sh
 ```
 
 ```bash
 # Сделайте исполняемым
-sudo chmod +x /home/monvoir/webhook_update.sh
+sudo chmod +x /home/shopapp/webhook_update.sh
 ```
 
 ### Шаг 2: Настройте простой webhook сервер
@@ -191,8 +191,8 @@ sudo chmod +x /home/monvoir/webhook_update.sh
 
 ```bash
 # На VPS переключитесь на production ветку
-cd /home/monvoir/app
-sudo -u monvoir git checkout production
+cd /home/shopapp/app
+sudo -u shopapp git checkout production
 sudo ./update_vps.sh
 ```
 
@@ -203,7 +203,7 @@ sudo ./update_vps.sh
 ```bash
 # Клонируйте в отдельную директорию
 cd /opt
-git clone -b development https://github.com/ваш-username/ваш-репозиторий.git monvoir-dev
+git clone -b development https://github.com/ваш-username/ваш-репозиторий.git shop-dev
 
 # Настройте на другом порту (например, 5001)
 # И используйте отдельную БД
@@ -253,7 +253,7 @@ backups/
 
 ```bash
 # Проверить текущую ветку и статус
-cd /home/monvoir/app
+cd /home/shopapp/app
 git branch
 git status
 
@@ -275,23 +275,23 @@ git remote -v
 
 ```bash
 # Если есть локальные изменения, сохраните их
-cd /home/monvoir/app
-sudo -u monvoir git stash
+cd /home/shopapp/app
+sudo -u shopapp git stash
 
 # Получите обновления
-sudo -u monvoir git pull
+sudo -u shopapp git pull
 
 # Примените сохраненные изменения (если нужно)
-sudo -u monvoir git stash pop
+sudo -u shopapp git stash pop
 ```
 
 ### Сброс до состояния в GitHub
 
 ```bash
 # ВНИМАНИЕ: Это удалит все локальные изменения!
-cd /home/monvoir/app
-sudo -u monvoir git fetch origin
-sudo -u monvoir git reset --hard origin/main  # или origin/master
+cd /home/shopapp/app
+sudo -u shopapp git fetch origin
+sudo -u shopapp git reset --hard origin/main  # или origin/master
 sudo ./update_vps.sh
 ```
 
@@ -321,10 +321,10 @@ git push origin feature/new-feature
 # 3. Ревьюите и мержите в main
 
 # 4. На VPS обновляете production
-ssh root@81.162.55.47
-cd /home/monvoir/app
-sudo -u monvoir git checkout main
-sudo -u monvoir git pull
+ssh root@YOUR_VPS_IP
+cd /home/shopapp/app
+sudo -u shopapp git checkout main
+sudo -u shopapp git pull
 sudo ./update_vps.sh
 ```
 

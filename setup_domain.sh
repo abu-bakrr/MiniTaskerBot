@@ -7,7 +7,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo -e "${BLUE}=== Настройка домена для Monvoir Shop ===${NC}"
+echo -e "${BLUE}=== Настройка домена для Telegram Shop ===${NC}"
 echo ""
 
 # Проверка прав root
@@ -29,18 +29,18 @@ echo -e "${YELLOW}Настройка Nginx для домена: $DOMAIN${NC}"
 echo ""
 
 # Создать конфигурацию Nginx
-cat > /etc/nginx/sites-available/monvoir << EOF
+cat > /etc/nginx/sites-available/shop << EOF
 server {
     listen 80;
     server_name $DOMAIN www.$DOMAIN;
 
     # Логи
-    access_log /var/log/nginx/monvoir_access.log;
-    error_log /var/log/nginx/monvoir_error.log;
+    access_log /var/log/nginx/shop_access.log;
+    error_log /var/log/nginx/shop_error.log;
 
     # Статические файлы (frontend)
     location / {
-        root /home/monvoir/app/dist/public;
+        root /home/shopapp/app/dist/public;
         try_files \$uri \$uri/ /index.html;
         add_header Cache-Control "public, max-age=3600";
     }

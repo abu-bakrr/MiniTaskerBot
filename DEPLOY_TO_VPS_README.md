@@ -1,7 +1,7 @@
 # 🚀 Быстрый старт: Развертывание на VPS
 
 ## Ваш VPS
-- **IP**: 81.162.55.47
+- **IP**: YOUR_VPS_IP
 - **ОС**: Ubuntu 22.04
 
 ---
@@ -14,13 +14,13 @@
 
 ```bash
 # Архивируйте проект (находясь в корне проекта)
-tar -czf monvoir-shop.tar.gz .
+tar -czf shop.tar.gz .
 
 # Загрузите на VPS
-scp monvoir-shop.tar.gz root@81.162.55.47:/root/
+scp shop.tar.gz root@YOUR_VPS_IP:/root/
 
 # Подключитесь к VPS
-ssh root@81.162.55.47
+ssh root@YOUR_VPS_IP
 ```
 
 ### Шаг 2: Распакуйте и запустите автоматическую установку
@@ -29,9 +29,9 @@ ssh root@81.162.55.47
 
 ```bash
 # Создайте директорию и распакуйте
-mkdir -p /opt/monvoir-deploy
-cd /opt/monvoir-deploy
-tar -xzf /root/monvoir-shop.tar.gz
+mkdir -p /opt/shop-deploy
+cd /opt/shop-deploy
+tar -xzf /root/shop.tar.gz
 
 # Запустите скрипт автоматической установки
 chmod +x deploy_vps.sh
@@ -48,9 +48,9 @@ chmod +x deploy_vps.sh
 - ✅ Настроит Firewall
 
 **Вас попросят ввести:**
-- Имя пользователя приложения (по умолчанию: monvoir)
-- Имя базы данных (по умолчанию: monvoir_shop)
-- Имя пользователя БД (по умолчанию: monvoir_user)
+- Имя пользователя приложения (по умолчанию: shopapp)
+- Имя базы данных (по умолчанию: shop_db)
+- Имя пользователя БД (по умолчанию: shop_user)
 - Пароль для БД
 - Порт приложения (по умолчанию: 5000)
 
@@ -58,7 +58,7 @@ chmod +x deploy_vps.sh
 
 После завершения установки приложение будет доступно по адресу:
 ```
-http://81.162.55.47
+http://YOUR_VPS_IP
 ```
 
 ---
@@ -78,32 +78,32 @@ VPS_DEPLOY_GUIDE.md
 
 ```bash
 # Проверить статус приложения
-systemctl status monvoir-app
+systemctl status shop-app
 
 # Перезапустить приложение
-systemctl restart monvoir-app
+systemctl restart shop-app
 
 # Остановить приложение
-systemctl stop monvoir-app
+systemctl stop shop-app
 
 # Запустить приложение
-systemctl start monvoir-app
+systemctl start shop-app
 
 # Просмотр логов в реальном времени
-journalctl -u monvoir-app -f
+journalctl -u shop-app -f
 
 # Просмотр последних 100 строк логов
-journalctl -u monvoir-app -n 100
+journalctl -u shop-app -n 100
 ```
 
 ### Просмотр логов Nginx:
 
 ```bash
 # Логи доступа
-tail -f /var/log/nginx/monvoir_access.log
+tail -f /var/log/nginx/shop_access.log
 
 # Логи ошибок
-tail -f /var/log/nginx/monvoir_error.log
+tail -f /var/log/nginx/shop_error.log
 ```
 
 ---
@@ -116,7 +116,7 @@ tail -f /var/log/nginx/monvoir_error.log
 
 ```bash
 # На VPS
-cd /home/monvoir/app
+cd /home/shopapp/app
 sudo ./update_vps.sh
 ```
 
@@ -130,13 +130,13 @@ sudo ./update_vps.sh
 ### Способ 2: Вручную
 
 ```bash
-cd /home/monvoir/app
+cd /home/shopapp/app
 
 # Обновить код (если используется git)
 git pull
 
 # Или загрузить новые файлы через SCP
-# scp -r /путь/к/проекту/* monvoir@81.162.55.47:/home/monvoir/app/
+# scp -r /путь/к/проекту/* shopapp@YOUR_VPS_IP:/home/shopapp/app/
 
 # Установить зависимости
 npm install
@@ -147,7 +147,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Перезапустить
-sudo systemctl restart monvoir-app
+sudo systemctl restart shop-app
 ```
 
 ---
@@ -160,7 +160,7 @@ sudo systemctl restart monvoir-app
 sudo ./backup_db.sh
 ```
 
-Резервные копии сохраняются в: `/home/monvoir/app/backups/`
+Резервные копии сохраняются в: `/home/shopapp/app/backups/`
 
 ### Восстановление из резервной копии:
 
@@ -173,13 +173,13 @@ sudo ./restore_db.sh
 ### Ручное создание резервной копии:
 
 ```bash
-sudo -u postgres pg_dump monvoir_shop > backup.sql
+sudo -u postgres pg_dump shop_db > backup.sql
 ```
 
 ### Ручное восстановление:
 
 ```bash
-sudo -u postgres psql monvoir_shop < backup.sql
+sudo -u postgres psql shop_db < backup.sql
 ```
 
 ---
@@ -240,16 +240,16 @@ sudo reboot
 
 ```bash
 # Проверить логи
-sudo journalctl -u monvoir-app -n 100
+sudo journalctl -u shop-app -n 100
 
 # Проверить конфигурацию
-cat /home/monvoir/app/.env
+cat /home/shopapp/app/.env
 
 # Проверить права доступа
-ls -la /home/monvoir/app
+ls -la /home/shopapp/app
 
 # Попробовать запустить вручную для отладки
-cd /home/monvoir/app
+cd /home/shopapp/app
 source venv/bin/activate
 python3 app.py
 ```
@@ -258,13 +258,13 @@ python3 app.py
 
 ```bash
 # Проверить, запущено ли приложение
-sudo systemctl status monvoir-app
+sudo systemctl status shop-app
 
 # Проверить, слушает ли приложение на порту
 sudo netstat -tulpn | grep 5000
 
 # Проверить логи Nginx
-sudo tail -f /var/log/nginx/monvoir_error.log
+sudo tail -f /var/log/nginx/shop_error.log
 ```
 
 ### База данных не подключается
@@ -274,10 +274,10 @@ sudo tail -f /var/log/nginx/monvoir_error.log
 sudo systemctl status postgresql
 
 # Попробовать подключиться вручную
-psql -U monvoir_user -d monvoir_shop -h localhost
+psql -U shop_user -d shop_db -h localhost
 
 # Проверить настройки подключения
-cat /home/monvoir/app/.env
+cat /home/shopapp/app/.env
 ```
 
 ### Nginx показывает 403 Forbidden для статических файлов (JS/CSS)
@@ -291,7 +291,7 @@ cat /home/monvoir/app/.env
 
 ```bash
 # Используйте скрипт автоматического исправления
-cd /home/monvoir/app
+cd /home/shopapp/app
 sudo ./fix_permissions.sh
 ```
 
@@ -299,15 +299,15 @@ sudo ./fix_permissions.sh
 
 ```bash
 # Настроить права на родительские директории
-sudo chmod 755 /home/monvoir
-sudo chmod 755 /home/monvoir/app
+sudo chmod 755 /home/shopapp
+sudo chmod 755 /home/shopapp/app
 
 # Настроить права на статические файлы
-sudo chown -R monvoir:www-data /home/monvoir/app/dist
-sudo chmod -R 755 /home/monvoir/app/dist
+sudo chown -R shopapp:www-data /home/shopapp/app/dist
+sudo chmod -R 755 /home/shopapp/app/dist
 
-sudo chown -R monvoir:www-data /home/monvoir/app/config
-sudo chmod -R 755 /home/monvoir/app/config
+sudo chown -R shopapp:www-data /home/shopapp/app/config
+sudo chmod -R 755 /home/shopapp/app/config
 
 # Перезапустить Nginx
 sudo systemctl restart nginx
@@ -362,10 +362,10 @@ sudo netstat -tulpn
 
 ```bash
 # Проверить количество запросов к приложению
-sudo tail -f /var/log/nginx/monvoir_access.log | grep -v "GET /assets"
+sudo tail -f /var/log/nginx/shop_access.log | grep -v "GET /assets"
 
 # Проверить время ответа
-sudo tail -f /var/log/nginx/monvoir_access.log | awk '{print $NF}'
+sudo tail -f /var/log/nginx/shop_access.log | awk '{print $NF}'
 ```
 
 ---
@@ -374,21 +374,21 @@ sudo tail -f /var/log/nginx/monvoir_access.log | awk '{print $NF}'
 
 ### Основные пути:
 
-- **Приложение**: `/home/monvoir/app`
-- **Логи приложения**: `journalctl -u monvoir-app`
+- **Приложение**: `/home/shopapp/app`
+- **Логи приложения**: `journalctl -u shop-app`
 - **Логи Nginx**: `/var/log/nginx/`
-- **Конфигурация Nginx**: `/etc/nginx/sites-available/monvoir`
-- **Systemd сервис**: `/etc/systemd/system/monvoir-app.service`
-- **Переменные окружения**: `/home/monvoir/app/.env`
-- **Резервные копии**: `/home/monvoir/app/backups/`
+- **Конфигурация Nginx**: `/etc/nginx/sites-available/shop`
+- **Systemd сервис**: `/etc/systemd/system/shop-app.service`
+- **Переменные окружения**: `/home/shopapp/app/.env`
+- **Резервные копии**: `/home/shopapp/app/backups/`
 
 ### Основные команды:
 
 | Действие | Команда |
 |----------|---------|
-| Статус приложения | `systemctl status monvoir-app` |
-| Перезапуск | `systemctl restart monvoir-app` |
-| Логи | `journalctl -u monvoir-app -f` |
+| Статус приложения | `systemctl status shop-app` |
+| Перезапуск | `systemctl restart shop-app` |
+| Логи | `journalctl -u shop-app -f` |
 | Обновление | `sudo ./update_vps.sh` |
 | Резервная копия | `sudo ./backup_db.sh` |
 | Восстановление | `sudo ./restore_db.sh` |
@@ -398,7 +398,7 @@ sudo tail -f /var/log/nginx/monvoir_access.log | awk '{print $NF}'
 
 ## ✅ Чеклист после развертывания
 
-- [ ] Приложение доступно по IP: http://81.162.55.47
+- [ ] Приложение доступно по IP: http://YOUR_VPS_IP
 - [ ] База данных работает
 - [ ] Логи не показывают ошибок
 - [ ] Firewall настроен
@@ -418,7 +418,7 @@ sudo tail -f /var/log/nginx/monvoir_access.log | awk '{print $NF}'
 sudo crontab -e
 
 # Добавьте строку:
-0 3 * * * /home/monvoir/app/backup_db.sh >> /var/log/monvoir-backup.log 2>&1
+0 3 * * * /home/shopapp/app/backup_db.sh >> /var/log/shop-backup.log 2>&1
 ```
 
 ---

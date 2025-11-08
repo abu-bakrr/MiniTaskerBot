@@ -8,7 +8,7 @@
 
 - ✅ Доменное имя (например: `myshop.com`)
 - ✅ Доступ к панели управления доменом
-- ✅ SSH доступ к VPS (81.162.55.47)
+- ✅ SSH доступ к VPS (YOUR_VPS_IP)
 
 ---
 
@@ -23,7 +23,7 @@
 ```
 Тип:  A
 Имя:  @ (или оставить пустым)
-Значение: 81.162.55.47
+Значение: YOUR_VPS_IP
 TTL:  3600 (или автоматически)
 ```
 
@@ -32,7 +32,7 @@ TTL:  3600 (или автоматически)
 ```
 Тип:  A
 Имя:  www
-Значение: 81.162.55.47
+Значение: YOUR_VPS_IP
 TTL:  3600
 ```
 
@@ -44,7 +44,7 @@ DNS записи обновляются от **5 минут до 24 часов**
 ```bash
 # На вашем компьютере
 ping myshop.com
-# Должен вернуть ваш IP: 81.162.55.47
+# Должен вернуть ваш IP: YOUR_VPS_IP
 ```
 
 ---
@@ -54,12 +54,12 @@ ping myshop.com
 ### 1️⃣ Подключитесь к VPS:
 
 ```bash
-ssh root@81.162.55.47
+ssh root@YOUR_VPS_IP
 ```
 
 ### 2️⃣ Создайте скрипт настройки домена:
 
-Сохраните этот скрипт в `/home/monvoir/app/setup_domain.sh`:
+Сохраните этот скрипт в `/home/shopapp/app/setup_domain.sh`:
 
 ```bash
 #!/bin/bash
@@ -69,7 +69,7 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-echo -e "${BLUE}=== Настройка домена для Monvoir Shop ===${NC}"
+echo -e "${BLUE}=== Настройка домена для Telegram Shop ===${NC}"
 
 # Запросить домен
 read -p "Введите ваш домен (например: myshop.com): " DOMAIN
@@ -82,18 +82,18 @@ fi
 echo -e "${BLUE}Настройка Nginx для домена: $DOMAIN${NC}"
 
 # Создать конфигурацию Nginx
-cat > /etc/nginx/sites-available/monvoir << EOF
+cat > /etc/nginx/sites-available/shop << EOF
 server {
     listen 80;
     server_name $DOMAIN www.$DOMAIN;
 
     # Логи
-    access_log /var/log/nginx/monvoir_access.log;
-    error_log /var/log/nginx/monvoir_error.log;
+    access_log /var/log/nginx/shop_access.log;
+    error_log /var/log/nginx/shop_error.log;
 
     # Статические файлы (frontend)
     location / {
-        root /home/monvoir/app/dist/public;
+        root /home/shopapp/app/dist/public;
         try_files \$uri \$uri/ /index.html;
         add_header Cache-Control "public, max-age=3600";
     }
@@ -145,7 +145,7 @@ EOF
 ### 3️⃣ Сделайте скрипт исполняемым и запустите:
 
 ```bash
-cd /home/monvoir/app
+cd /home/shopapp/app
 chmod +x setup_domain.sh
 sudo ./setup_domain.sh
 ```
@@ -168,7 +168,7 @@ sudo ./setup_domain.sh
 
 ### 1️⃣ Создайте скрипт установки SSL:
 
-Сохраните в `/home/monvoir/app/setup_ssl.sh`:
+Сохраните в `/home/shopapp/app/setup_ssl.sh`:
 
 ```bash
 #!/bin/bash
@@ -222,7 +222,7 @@ fi
 ### 2️⃣ Запустите установку SSL:
 
 ```bash
-cd /home/monvoir/app
+cd /home/shopapp/app
 chmod +x setup_ssl.sh
 sudo ./setup_ssl.sh
 ```
@@ -286,7 +286,7 @@ certbot renew --dry-run
 ```bash
 # На вашем компьютере
 nslookup myshop.com
-# Должен вернуть: 81.162.55.47
+# Должен вернуть: YOUR_VPS_IP
 ```
 
 Если IP не совпадает - DNS еще не обновился. Подождите 30-60 минут.
@@ -297,7 +297,7 @@ nslookup myshop.com
 ```bash
 sudo nginx -t
 sudo systemctl status nginx
-sudo tail -f /var/log/nginx/monvoir_error.log
+sudo tail -f /var/log/nginx/shop_error.log
 ```
 
 ### SSL сертификат не устанавливается
@@ -331,8 +331,8 @@ ping myshop.com
 
 ## ✅ Чеклист настройки домена
 
-- [ ] DNS A-запись добавлена (@ → 81.162.55.47)
-- [ ] DNS A-запись для www добавлена (www → 81.162.55.47)
+- [ ] DNS A-запись добавлена (@ → YOUR_VPS_IP)
+- [ ] DNS A-запись для www добавлена (www → YOUR_VPS_IP)
 - [ ] Домен резолвится в IP (проверка через ping)
 - [ ] Nginx настроен для домена (`setup_domain.sh`)
 - [ ] Сайт открывается по HTTP
@@ -359,8 +359,8 @@ certbot certificates
 certbot renew
 
 # Посмотреть логи Nginx
-tail -f /var/log/nginx/monvoir_access.log
-tail -f /var/log/nginx/monvoir_error.log
+tail -f /var/log/nginx/shop_access.log
+tail -f /var/log/nginx/shop_error.log
 ```
 
 ---

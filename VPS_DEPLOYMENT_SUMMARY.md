@@ -34,18 +34,18 @@
 
 ```bash
 # 1. На вашем компьютере - создайте архив
-tar -czf monvoir.tar.gz .
+tar -czf shop.tar.gz .
 
 # 2. Загрузите на VPS
-scp monvoir.tar.gz root@81.162.55.47:/root/
+scp shop.tar.gz root@YOUR_VPS_IP:/root/
 
 # 3. Подключитесь к VPS
-ssh root@81.162.55.47
+ssh root@YOUR_VPS_IP
 
 # 4. Распакуйте и запустите установку
-mkdir -p /opt/monvoir-deploy
-cd /opt/monvoir-deploy
-tar -xzf /root/monvoir.tar.gz
+mkdir -p /opt/shop-deploy
+cd /opt/shop-deploy
+tar -xzf /root/shop.tar.gz
 chmod +x deploy_vps.sh
 ./deploy_vps.sh
 ```
@@ -110,7 +110,7 @@ PostgreSQL (порт 5432, localhost)
 ### Структура на сервере
 
 ```
-/home/monvoir/
+/home/shopapp/
 └── app/
     ├── venv/              # Python виртуальное окружение
     ├── dist/              # Собранный фронтенд
@@ -150,7 +150,7 @@ PostgreSQL (порт 5432, localhost)
 ### Обновление приложения
 
 ```bash
-cd /home/monvoir/app
+cd /home/shopapp/app
 sudo ./update_vps.sh
 ```
 
@@ -168,13 +168,13 @@ sudo ./restore_db.sh
 
 ```bash
 # Статус приложения
-systemctl status monvoir-app
+systemctl status shop-app
 
 # Логи приложения
-journalctl -u monvoir-app -f
+journalctl -u shop-app -f
 
 # Логи Nginx
-tail -f /var/log/nginx/monvoir_error.log
+tail -f /var/log/nginx/shop_error.log
 
 # Использование ресурсов
 htop
@@ -203,7 +203,7 @@ Nginx кеширует статические файлы:
 
 После развертывания:
 
-- **HTTP**: http://81.162.55.47
+- **HTTP**: http://YOUR_VPS_IP
 - **Telegram Mini App**: Настройте URL в BotFather
 
 ### Настройка SSL (опционально)
@@ -229,8 +229,8 @@ sudo certbot --nginx -d yourdomain.com
 
 | Проблема | Решение |
 |----------|---------|
-| Приложение не открывается | `systemctl status monvoir-app`, проверить логи |
-| 502 Bad Gateway | Проверить, запущен ли Flask: `systemctl status monvoir-app` |
+| Приложение не открывается | `systemctl status shop-app`, проверить логи |
+| 502 Bad Gateway | Проверить, запущен ли Flask: `systemctl status shop-app` |
 | База данных не подключается | `systemctl status postgresql`, проверить .env |
 | Нет места на диске | `df -h`, очистить старые логи и бэкапы |
 | Высокая нагрузка | `htop`, увеличить количество workers в Gunicorn |
@@ -243,16 +243,16 @@ sudo certbot --nginx -d yourdomain.com
 
 ### Основные файлы конфигурации
 
-- Systemd сервис: `/etc/systemd/system/monvoir-app.service`
-- Nginx конфигурация: `/etc/nginx/sites-available/monvoir`
-- Переменные окружения: `/home/monvoir/app/.env`
+- Systemd сервис: `/etc/systemd/system/shop-app.service`
+- Nginx конфигурация: `/etc/nginx/sites-available/shop`
+- Переменные окружения: `/home/shopapp/app/.env`
 - PostgreSQL настройки: `/etc/postgresql/14/main/postgresql.conf`
 
 ### Логи
 
-- Приложение: `journalctl -u monvoir-app`
-- Nginx доступ: `/var/log/nginx/monvoir_access.log`
-- Nginx ошибки: `/var/log/nginx/monvoir_error.log`
+- Приложение: `journalctl -u shop-app`
+- Nginx доступ: `/var/log/nginx/shop_access.log`
+- Nginx ошибки: `/var/log/nginx/shop_error.log`
 - PostgreSQL: `/var/log/postgresql/postgresql-14-main.log`
 
 ---
@@ -270,7 +270,7 @@ sudo certbot --nginx -d yourdomain.com
 sudo crontab -e
 
 # Добавить строку:
-0 3 * * * /home/monvoir/app/backup_db.sh >> /var/log/monvoir-backup.log 2>&1
+0 3 * * * /home/shopapp/app/backup_db.sh >> /var/log/shop-backup.log 2>&1
 ```
 
 ### Мониторинг производительности
@@ -338,5 +338,5 @@ sudo apt install nethogs
 ---
 
 *Дата создания: 07 ноября 2025*  
-*VPS IP: 81.162.55.47*  
+*VPS IP: YOUR_VPS_IP*  
 *OS: Ubuntu 22.04*
