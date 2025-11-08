@@ -68,6 +68,7 @@ sudo ./deploy_vps.sh
 ### VPS Documentation
 
 - 📘 **Quick Start (RU)**: `QUICK_START_RU.md` ⭐
+- 🌐 **Domain & SSL Setup**: `DOMAIN_SETUP_RU.md`
 - 📗 **Full Guide**: `DEPLOY_TO_VPS_README.md`
 - 📕 **Scripts Reference**: `VPS_SCRIPTS_README.md`
 - 📙 **GitHub Deployment**: `DEPLOY_FROM_GITHUB.md`
