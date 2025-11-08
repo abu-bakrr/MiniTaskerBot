@@ -45,8 +45,8 @@ This is a **universal template** for creating e-commerce Telegram Mini Apps. The
 
 ```bash
 # 1. Clone repository on VPS
-git clone <your-repo> /opt/monvoir-deploy
-cd /opt/monvoir-deploy
+git clone <your-repo> /opt/shop-deploy
+cd /opt/shop-deploy
 
 # 2. Run auto-deployment
 chmod +x deploy_vps.sh
@@ -217,10 +217,10 @@ python app.py
 
 ## Example Configurations
 
-### Clothing Store
+### Example Store 1
 ```json
 {
-  "shopName": "Fashion Boutique",
+  "shopName": "My Fashion Store",
   "currency": { "symbol": "$", "code": "USD", "position": "before" },
   "colorScheme": {
     "primary": "#FF6B9D",
@@ -229,10 +229,10 @@ python app.py
 }
 ```
 
-### Electronics Shop
+### Example Store 2
 ```json
 {
-  "shopName": "TechHub",
+  "shopName": "My Electronics Shop",
   "currency": { "symbol": "€", "code": "EUR", "position": "after" },
   "colorScheme": {
     "primary": "#2C3E50",

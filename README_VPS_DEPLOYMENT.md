@@ -44,16 +44,16 @@
 
 ```bash
 # 1. Подключитесь к VPS и клонируйте
-ssh root@81.162.55.47
-cd /opt && git clone https://github.com/ваш-username/ваш-репозиторий.git monvoir-deploy
+ssh root@YOUR_VPS_IP
+cd /opt && git clone https://github.com/ваш-username/ваш-репозиторий.git shop-deploy
 
 # 2. Запустите установку
-cd monvoir-deploy && chmod +x deploy_vps.sh && ./deploy_vps.sh
+cd shop-deploy && chmod +x deploy_vps.sh && ./deploy_vps.sh
 ```
 
 **Замените** `ваш-username/ваш-репозиторий` на ваш GitHub URL!
 
-После завершения откройте: **http://81.162.55.47**
+После завершения откройте: **http://YOUR_VPS_IP**
 
 ---
 
@@ -64,9 +64,9 @@ cd monvoir-deploy && chmod +x deploy_vps.sh && ./deploy_vps.sh
 git push
 
 # На VPS
-ssh root@81.162.55.47
-cd /home/monvoir/app
-sudo -u monvoir git pull && sudo ./update_vps.sh
+ssh root@YOUR_VPS_IP
+cd /home/shopapp/app
+sudo -u shopapp git pull && sudo ./update_vps.sh
 ```
 
 ---
@@ -99,8 +99,8 @@ sudo -u monvoir git pull && sudo ./update_vps.sh
 Создайте SSH ключ и добавьте в GitHub:
 
 ```bash
-ssh root@81.162.55.47
-ssh-keygen -t ed25519 -C "vps@monvoir"
+ssh root@YOUR_VPS_IP
+ssh-keygen -t ed25519 -C "vps@shop"
 cat ~/.ssh/id_ed25519.pub
 # Добавьте в GitHub → Settings → SSH and GPG keys
 ```
@@ -124,16 +124,16 @@ cat ~/.ssh/id_ed25519.pub
 
 ```bash
 # Проверить статус
-systemctl status monvoir-app
+systemctl status shop-app
 
 # Логи приложения
-journalctl -u monvoir-app -f
+journalctl -u shop-app -f
 
 # Резервная копия
-cd /home/monvoir/app && sudo ./backup_db.sh
+cd /home/shopapp/app && sudo ./backup_db.sh
 
 # Перезапустить
-systemctl restart monvoir-app
+systemctl restart shop-app
 ```
 
 ---
@@ -141,7 +141,7 @@ systemctl restart monvoir-app
 ## 🌐 После развертывания
 
 Ваше приложение будет доступно:
-- **HTTP**: http://81.162.55.47
+- **HTTP**: http://YOUR_VPS_IP
 - **Telegram Mini App**: Настройте URL в BotFather
 
 Для SSL (HTTPS) см. **[VPS_DEPLOY_GUIDE.md](VPS_DEPLOY_GUIDE.md)** → "Настройка SSL"

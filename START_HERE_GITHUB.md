@@ -30,14 +30,14 @@ git push
 
 ```bash
 # Подключитесь к VPS
-ssh root@81.162.55.47
+ssh root@YOUR_VPS_IP
 
 # Клонируйте ваш репозиторий (ЗАМЕНИТЕ на ваш URL!)
 cd /opt
-git clone https://github.com/ваш-username/ваш-репозиторий.git monvoir-deploy
+git clone https://github.com/ваш-username/ваш-репозиторий.git shop-deploy
 
 # Запустите установку
-cd monvoir-deploy
+cd shop-deploy
 chmod +x deploy_vps.sh
 ./deploy_vps.sh
 ```
@@ -46,7 +46,7 @@ chmod +x deploy_vps.sh
 
 ### 3. Готово! 🎉
 
-Откройте в браузере: **http://81.162.55.47**
+Откройте в браузере: **http://YOUR_VPS_IP**
 
 ---
 
@@ -72,9 +72,9 @@ git push
 
 **На VPS:**
 ```bash
-ssh root@81.162.55.47
-cd /home/monvoir/app
-sudo -u monvoir git pull
+ssh root@YOUR_VPS_IP
+cd /home/shopapp/app
+sudo -u shopapp git pull
 sudo ./update_vps.sh
 ```
 
@@ -111,15 +111,15 @@ sudo ./update_vps.sh
 Создайте SSH ключ на VPS и добавьте его в GitHub:
 
 ```bash
-ssh root@81.162.55.47
-ssh-keygen -t ed25519 -C "vps@monvoir"
+ssh root@YOUR_VPS_IP
+ssh-keygen -t ed25519 -C "vps@shop"
 cat ~/.ssh/id_ed25519.pub
 # Скопируйте вывод и добавьте в GitHub → Settings → SSH keys
 ```
 
 Затем клонируйте через SSH:
 ```bash
-git clone git@github.com:ваш-username/ваш-репозиторий.git monvoir-deploy
+git clone git@github.com:ваш-username/ваш-репозиторий.git shop-deploy
 ```
 
 ### Как узнать, какая версия сейчас на сервере?

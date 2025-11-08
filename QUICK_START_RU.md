@@ -3,7 +3,7 @@
 ## 📋 Что вам нужно
 
 - **VPS**: Ubuntu 22.04
-- **IP**: 81.162.55.47
+- **IP**: YOUR_VPS_IP
 - **Доступ**: SSH с правами root
 - **Репозиторий**: GitHub (у вас уже есть!)
 
@@ -14,7 +14,7 @@
 ### 1️⃣ Подключитесь к VPS
 
 ```bash
-ssh root@81.162.55.47
+ssh root@YOUR_VPS_IP
 ```
 
 ### 2️⃣ Клонируйте репозиторий и запустите установку
@@ -22,10 +22,10 @@ ssh root@81.162.55.47
 ```bash
 # Клонируйте ваш репозиторий GitHub
 cd /opt
-git clone https://github.com/ваш-username/ваш-репозиторий.git monvoir-deploy
+git clone https://github.com/ваш-username/ваш-репозиторий.git shop-deploy
 
 # Запустите автоматическую установку
-cd monvoir-deploy
+cd shop-deploy
 chmod +x deploy_vps.sh
 ./deploy_vps.sh
 ```
@@ -42,20 +42,20 @@ chmod +x deploy_vps.sh
 
 ```bash
 # На вашем компьютере
-tar -czf monvoir.tar.gz .
-scp monvoir.tar.gz root@81.162.55.47:/root/
+tar -czf shop.tar.gz .
+scp shop.tar.gz root@YOUR_VPS_IP:/root/
 ```
 
 ### 2️⃣ Подключитесь к VPS и распакуйте
 
 ```bash
 # Подключитесь
-ssh root@81.162.55.47
+ssh root@YOUR_VPS_IP
 
 # Распакуйте
-mkdir -p /opt/monvoir-deploy
-cd /opt/monvoir-deploy
-tar -xzf /root/monvoir.tar.gz
+mkdir -p /opt/shop-deploy
+cd /opt/shop-deploy
+tar -xzf /root/shop.tar.gz
 ```
 
 ### 3️⃣ Запустите автоматическую установку
@@ -75,7 +75,7 @@ chmod +x deploy_vps.sh
 
 После установки откройте в браузере:
 ```
-http://81.162.55.47
+http://YOUR_VPS_IP
 ```
 
 ---
@@ -84,16 +84,16 @@ http://81.162.55.47
 
 ```bash
 # Проверить статус
-systemctl status monvoir-app
+systemctl status shop-app
 
 # Перезапустить
-systemctl restart monvoir-app
+systemctl restart shop-app
 
 # Посмотреть логи
-journalctl -u monvoir-app -f
+journalctl -u shop-app -f
 
 # Обновить приложение
-cd /home/monvoir/app
+cd /home/shopapp/app
 sudo ./update_vps.sh
 
 # Сделать резервную копию БД
@@ -125,9 +125,9 @@ git commit -m "Описание ваших изменений"
 git push
 
 # 2. На VPS - получите обновления и перезапустите
-ssh root@81.162.55.47
-cd /home/monvoir/app
-sudo -u monvoir git pull
+ssh root@YOUR_VPS_IP
+cd /home/shopapp/app
+sudo -u shopapp git pull
 sudo ./update_vps.sh
 ```
 
