@@ -12,7 +12,17 @@ This is a **universal template** for creating e-commerce Telegram Mini Apps. The
 
 ## Recent Changes
 
-### October 26, 2025 (Latest) - Custom Fonts and Logo Sizing
+### November 09, 2025 (Latest) - Telegram Bot Windows EXE Support
+- **Automated Token Collection**: `deploy_vps.sh` now requests all Telegram bot tokens during VPS deployment
+- **Separate Bot Environment**: Creates dedicated `.env` file in `telegram_bot/` with all required credentials
+- **Category Synchronization**: Automatically syncs categories from `config/settings.json` to `telegram_bot/settingsbot.json`
+- **Admin ID Management**: Safely handles Telegram admin ID input (numeric IDs, removes @ prefix if present)
+- **Windows EXE Build**: New `build_exe.bat` script for one-click bot compilation on Windows using PyInstaller
+- **PyInstaller Configuration**: Pre-configured `bot.spec` file with all dependencies and data files
+- **Bot Download System**: Creates zip archive of telegram_bot folder and provides `scp` command for download
+- **Comprehensive Documentation**: Added `README_BUILD.md` with step-by-step Windows build instructions
+
+### October 26, 2025 - Custom Fonts and Logo Sizing
 - **Custom Fonts**: Added support for custom font files with configurable font-family and font-weight
 - **Typography Control**: Separate font-weight settings for product names, prices, and descriptions
 - **Dynamic Logo Sizing**: Configurable logo size with automatic proportion preservation
