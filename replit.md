@@ -111,15 +111,24 @@ sudo ./deploy_vps.sh
 | `backup_db.sh` | Backup PostgreSQL database | No ❌ |
 | `restore_db.sh` | Restore database from backup | Yes ✅ |
 
-### VPS Documentation
+### 📚 Documentation
 
-- ⚡ **One-Command Install**: `БЫСТРАЯ_УСТАНОВКА.md` ⭐⭐⭐ (Auto, no questions!)
-- 🚀 **GitHub Quick Start**: `GITHUB_QUICK_START.md` ⭐ (Interactive)
-- 📘 **Quick Start (RU)**: `QUICK_START_RU.md`
-- 🌐 **Domain & SSL Setup**: `DOMAIN_SETUP_RU.md`
-- 📗 **Full Guide**: `DEPLOY_TO_VPS_README.md`
-- 📕 **Scripts Reference**: `VPS_SCRIPTS_README.md`
-- 📙 **GitHub Deployment Details**: `DEPLOY_FROM_GITHUB.md`
+**All documentation is in the `docs/` folder:**
+
+- 📖 **[COMPLETE GUIDE](docs/ПОЛНОЕ_РУКОВОДСТВО.md)** ⭐⭐⭐ - Everything in one file!
+  - How to customize your shop
+  - How to deploy to VPS
+  - How to update
+  - Domain and SSL setup
+  - Troubleshooting
+
+**Quick Links:**
+- ⚡ **[One-Command Install](docs/БЫСТРАЯ_УСТАНОВКА.md)** - Auto-deploy, no questions
+- 🚀 **[Interactive Install](docs/QUICK_START_RU.md)** - Step-by-step with customization
+- 🌐 **[Domain & SSL](docs/DOMAIN_SETUP_RU.md)** - Custom domain setup
+- 🔧 **[All Scripts](docs/VPS_SCRIPTS_README.md)** - Scripts reference
+
+**[📁 Browse all documentation](docs/README.md)**
 
 ## Template Configuration
 
