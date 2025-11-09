@@ -463,10 +463,18 @@ echo ""
 # Создание архива telegram_bot для скачивания
 print_step "Создание архива Telegram бота для Windows..."
 cd $APP_DIR
+
+# Автоматическая замена localhost на VPS IP в .env для Windows
+VPS_IP=$(hostname -I | awk '{print $1}')
+print_step "Настройка DATABASE_URL для Windows (замена localhost на $VPS_IP)..."
+sed -i "s/@localhost:/@$VPS_IP:/g" $APP_DIR/telegram_bot/.env
+
 apt install -y zip > /dev/null 2>&1
 ZIP_FILE="telegram_bot_$(date +%Y%m%d_%H%M%S).zip"
 zip -r $ZIP_FILE telegram_bot/ -x "telegram_bot/__pycache__/*" > /dev/null 2>&1
 chown $APP_USER:$APP_USER $ZIP_FILE
+
+print_step "✅ DATABASE_URL автоматически настроен для Windows"
 
 echo ""
 echo "=================================================="
@@ -479,10 +487,14 @@ echo "📥 Команда для скачивания на ваш Windows ком
 echo ""
 echo -e "${YELLOW}scp root@$(hostname -I | awk '{print $1}'):$APP_DIR/$ZIP_FILE .${NC}"
 echo ""
+echo "✅ DATABASE_URL уже настроен автоматически (использует IP: $VPS_IP)"
+echo ""
 echo "После скачивания:"
 echo "  1. Распакуйте архив"
 echo "  2. Запустите build_exe.bat в папке telegram_bot"
 echo "  3. Получите готовый .exe файл в папке dist/"
+echo ""
+echo "💡 Файл .env уже содержит правильный IP вашего VPS - никаких изменений не требуется!"
 echo ""
 echo "=================================================="
 echo ""

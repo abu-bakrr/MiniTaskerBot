@@ -20,6 +20,7 @@ This is a **universal template** for creating e-commerce Telegram Mini Apps. The
 - **Windows EXE Build**: New `build_exe.bat` script for one-click bot compilation on Windows using PyInstaller
 - **PyInstaller Configuration**: Pre-configured `bot.spec` file with all dependencies and data files
 - **Bot Download System**: Creates zip archive of telegram_bot folder and provides `scp` command for download
+- **Automatic DATABASE_URL Fix**: `deploy_vps.sh` automatically replaces localhost with VPS IP before creating archive
 - **Comprehensive Documentation**: Added `README_BUILD.md` with step-by-step Windows build instructions
 
 ### October 26, 2025 - Custom Fonts and Logo Sizing
