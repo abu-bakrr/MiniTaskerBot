@@ -13,3 +13,6 @@ flask
 flask-sqlalchemy
 gunicorn
 psycopg2-binary
+flask
+psycopg2-binary
+requests
