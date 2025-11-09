@@ -33,17 +33,48 @@ This is a **universal template** for creating e-commerce Telegram Mini Apps. The
 - **Static File Serving**: Configured Flask to serve pre-built React frontend from `dist/public/`
 - **Telegram Mini App Database Integration**: Updated database schema for full Telegram authentication support
 
+### November 9, 2025 - One-Command Auto-Deploy
+- **New `auto_deploy.sh`**: Fully automatic deployment without any questions - just one command!
+- **Auto-generated passwords**: Secure random DB passwords generated automatically
+- **No user input**: All parameters use smart defaults or can be set via environment variables
+- **3-5 minute deploy**: Fastest deployment method available
+- **New Documentation**: Added `БЫСТРАЯ_УСТАНОВКА.md` (One-Command Install guide)
+
 ### November 8, 2025 - VPS Deployment Improvements
 - **GitHub Integration**: `deploy_vps.sh` now supports direct cloning from GitHub
-- **One-Command Deploy**: Download and run deployment script directly from GitHub
+- **Interactive Deploy**: Download and run deployment script directly from GitHub
 - **Auto-fix Permissions**: `deploy_vps.sh` automatically configures Nginx permissions
 - **New Script**: `fix_permissions.sh` for quick resolution of 403 Forbidden errors
-- **Enhanced Documentation**: Added `GITHUB_QUICK_START.md` for fastest deployment
+- **Enhanced Documentation**: Added `GITHUB_QUICK_START.md` for interactive deployment
 - **Flexible Source**: Support for both GitHub and local file deployment
 
 ## 🚀 VPS Deployment Quick Start
 
-### Deploy in 1 Command from GitHub! ⚡
+### ⚡ Auto-Deploy (1 Command, No Questions!)
+
+**Fastest way - fully automatic:**
+
+```bash
+# Connect to VPS
+ssh root@YOUR_VPS_IP
+
+# Auto-deploy from GitHub (one command!)
+GITHUB_REPO="https://github.com/YOUR_USERNAME/YOUR_REPO.git" \
+curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/auto_deploy.sh | sudo bash
+```
+
+**Done in 3-5 minutes!** Opens at: `http://YOUR_VPS_IP`
+
+- ✅ No questions asked - all defaults
+- ✅ Auto-generated DB password
+- ✅ Clones from GitHub automatically
+- ✅ Builds and starts everything
+
+---
+
+### 📋 Interactive Deploy (with custom settings)
+
+**If you want to customize settings:**
 
 ```bash
 # Connect to VPS
@@ -55,16 +86,7 @@ chmod +x deploy_vps.sh
 sudo ./deploy_vps.sh
 ```
 
-When prompted, enter your GitHub repository URL:
-```
-https://github.com/YOUR_USERNAME/YOUR_REPO.git
-```
-
-**Done!** The script automatically:
-- ✅ Clones your repository from GitHub
-- ✅ Installs PostgreSQL, Nginx, Node.js
-- ✅ Builds frontend
-- ✅ Configures everything and starts the app
+When prompted, enter your GitHub repository URL or leave empty for local files.
 
 **Alternative - Clone first, then deploy:**
 
@@ -80,17 +102,19 @@ sudo ./deploy_vps.sh
 
 ### Available Scripts
 
-| Script | Purpose |
-|--------|---------|
-| `deploy_vps.sh` | Initial deployment (all-in-one) |
-| `update_vps.sh` | Update deployed application |
-| `fix_permissions.sh` | Fix 403 Forbidden errors |
-| `backup_db.sh` | Backup PostgreSQL database |
-| `restore_db.sh` | Restore database from backup |
+| Script | Purpose | Interactive |
+|--------|---------|-------------|
+| `auto_deploy.sh` | **Fastest** - Auto-deploy without questions | No ❌ |
+| `deploy_vps.sh` | Interactive deployment with custom settings | Yes ✅ |
+| `update_vps.sh` | Update deployed application | Yes ✅ |
+| `fix_permissions.sh` | Fix 403 Forbidden errors | No ❌ |
+| `backup_db.sh` | Backup PostgreSQL database | No ❌ |
+| `restore_db.sh` | Restore database from backup | Yes ✅ |
 
 ### VPS Documentation
 
-- ⚡ **GitHub Quick Start**: `GITHUB_QUICK_START.md` ⭐ (Fastest way!)
+- ⚡ **One-Command Install**: `БЫСТРАЯ_УСТАНОВКА.md` ⭐⭐⭐ (Auto, no questions!)
+- 🚀 **GitHub Quick Start**: `GITHUB_QUICK_START.md` ⭐ (Interactive)
 - 📘 **Quick Start (RU)**: `QUICK_START_RU.md`
 - 🌐 **Domain & SSL Setup**: `DOMAIN_SETUP_RU.md`
 - 📗 **Full Guide**: `DEPLOY_TO_VPS_README.md`
