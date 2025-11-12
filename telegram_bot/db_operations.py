@@ -1,5 +1,6 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from typing import Optional, List, Dict, Any
 import os
 import json
 from pathlib import Path
@@ -73,7 +74,7 @@ def get_categories_from_config():
         return []
 
 
-def add_product(name, description, price, images, category_id=None):
+def add_product(name: str, description: str, price: int, images: List[str], category_id: Optional[str] = None) -> Optional[Dict[str, Any]]:
     """
     Adds new product to database
     
@@ -87,6 +88,7 @@ def add_product(name, description, price, images, category_id=None):
     Returns:
         dict: Dictionary with created product data or None if error
     """
+    conn = None
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -101,10 +103,12 @@ def add_product(name, description, price, images, category_id=None):
         return product
     except Exception as e:
         print(f"Error adding product: {e}")
+        if conn:
+            conn.close()
         return None
 
 
-def delete_product(product_id):
+def delete_product(product_id: str) -> bool:
     """
     Deletes product from database
     
@@ -114,6 +118,7 @@ def delete_product(product_id):
     Returns:
         bool: True if product deleted, False if error
     """
+    conn = None
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -125,10 +130,12 @@ def delete_product(product_id):
         return deleted_count > 0
     except Exception as e:
         print(f"Error deleting product: {e}")
+        if conn:
+            conn.close()
         return False
 
 
-def get_all_products(category_id=None):
+def get_all_products(category_id: Optional[str] = None) -> List[Dict[str, Any]]:
     """
     Gets all products from database (with optional category filter)
     
@@ -138,6 +145,7 @@ def get_all_products(category_id=None):
     Returns:
         list: Array of product dictionaries or empty array if error
     """
+    conn = None
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -153,10 +161,12 @@ def get_all_products(category_id=None):
         return products
     except Exception as e:
         print(f"Error getting products: {e}")
+        if conn:
+            conn.close()
         return []
 
 
-def get_product_by_id(product_id):
+def get_product_by_id(product_id: str) -> Optional[Dict[str, Any]]:
     """
     Gets product by ID
     
@@ -166,6 +176,7 @@ def get_product_by_id(product_id):
     Returns:
         dict: Dictionary with product data or None if not found
     """
+    conn = None
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -176,10 +187,12 @@ def get_product_by_id(product_id):
         return product
     except Exception as e:
         print(f"Error getting product: {e}")
+        if conn:
+            conn.close()
         return None
 
 
-def find_products_by_name(name):
+def find_products_by_name(name: str) -> List[Dict[str, Any]]:
     """
     Searches products by name (partial match)
     
@@ -189,6 +202,7 @@ def find_products_by_name(name):
     Returns:
         list: Array of product dictionaries or empty array
     """
+    conn = None
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -199,4 +213,6 @@ def find_products_by_name(name):
         return products
     except Exception as e:
         print(f"Error searching products: {e}")
+        if conn:
+            conn.close()
         return []

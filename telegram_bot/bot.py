@@ -14,6 +14,7 @@ from io import BytesIO
 from pathlib import Path
 from dotenv import load_dotenv
 import time
+from typing import Dict, Any, List, Optional, cast
 
 load_dotenv()
 from db_operations import (
@@ -191,8 +192,9 @@ class ProductBot:
             # Создаем inline кнопки для каждого товара
             markup = types.InlineKeyboardMarkup(row_width=1)
             for product in products[:20]:  # Показываем первые 20
-                btn_text = f"🗑 {product['name']} - {product['price']:,} сум"
-                callback_data = f"delete_{product['id']}"
+                p = cast(Dict[str, Any], product)
+                btn_text = f"🗑 {p['name']} - {p['price']:,} сум"
+                callback_data = f"delete_{p['id']}"
                 markup.add(types.InlineKeyboardButton(btn_text, callback_data=callback_data))
             
             self.bot.send_message(
@@ -221,9 +223,10 @@ class ProductBot:
             response = f"📋 <b>Список товаров ({len(products)}):</b>\n\n"
             
             for idx, product in enumerate(products[:30], 1):  # Показываем первые 30
-                response += f"{idx}. <b>{product['name']}</b>\n"
-                response += f"   💰 Цена: {product['price']:,} сум\n"
-                response += f"   🆔 ID: <code>{product['id']}</code>\n\n"
+                p = cast(Dict[str, Any], product)
+                response += f"{idx}. <b>{p['name']}</b>\n"
+                response += f"   💰 Цена: {p['price']:,} сум\n"
+                response += f"   🆔 ID: <code>{p['id']}</code>\n\n"
             
             if len(products) > 30:
                 response += f"\n... и еще {len(products) - 30} товаров"
@@ -295,10 +298,11 @@ class ProductBot:
             # Удаляем товар
             if delete_product(product_id):
                 self.bot.answer_callback_query(call.id, "✅ Товар удален")
+                p = cast(Dict[str, Any], product)
                 self.bot.edit_message_text(
                     f"✅ <b>Товар успешно удален:</b>\n\n"
-                    f"📦 {product['name']}\n"
-                    f"💰 {product['price']:,} сум\n"
+                    f"📦 {p['name']}\n"
+                    f"💰 {p['price']:,} сум\n"
                     f"🆔 {product_id}",
                     call.message.chat.id,
                     call.message.message_id,
@@ -489,15 +493,16 @@ class ProductBot:
                 )
                 
                 if product:
+                    p = cast(Dict[str, Any], product)
                     self.bot.send_message(
                         message.chat.id,
                         f"✅ <b>Товар успешно добавлен!</b>\n\n"
-                        f"📦 Название: {product['name']}\n"
-                        f"📝 Описание: {product['description']}\n"
-                        f"💰 Цена: {product['price']:,} сум\n"
+                        f"📦 Название: {p['name']}\n"
+                        f"📝 Описание: {p['description']}\n"
+                        f"💰 Цена: {p['price']:,} сум\n"
                         f"📁 Категория: {self.temp_data[user_id]['category_id']}\n"
                         f"📸 Фотографий: {len(images)}\n"
-                        f"🆔 ID: <code>{product['id']}</code>",
+                        f"🆔 ID: <code>{p['id']}</code>",
                         parse_mode='HTML',
                         reply_markup=self._create_main_menu()
                     )
