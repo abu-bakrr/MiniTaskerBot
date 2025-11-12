@@ -12,16 +12,21 @@ This is a **universal template** for creating e-commerce Telegram Mini Apps. The
 
 ## Recent Changes
 
-### November 09, 2025 (Latest) - Telegram Bot Windows EXE Support
+### November 12, 2025 (Latest) - Remote Database Access & Bot Deployment
+- **Remote DB Access**: New `enable_remote_db.sh` script to configure PostgreSQL for remote connections
+- **Local Bot Development**: Full support for running bot locally on Windows/Mac with remote DB connection
+- **VPS Bot Deployment**: New `deploy_bot_to_vps.sh` for running bot as systemd service on VPS
+- **Database Connection Resilience**: Added retry logic with 3 attempts and 2s delays
+- **Telegram Auto-Reconnection**: Exponential backoff (5-60s) for handling network disruptions
+- **Environment Variable Support**: Full `.env` file support in bot.py and db_operations.py
+- **Type Safety**: Fixed all LSP errors with proper type hints and cast() usage
+- **Comprehensive Docs**: Added `BOT_DEPLOYMENT.md` and `REMOTE_DB_ACCESS.md` guides
+
+### November 09, 2025 - Telegram Bot Windows EXE Support
 - **Automated Token Collection**: `deploy_vps.sh` now requests all Telegram bot tokens during VPS deployment
 - **Separate Bot Environment**: Creates dedicated `.env` file in `telegram_bot/` with all required credentials
 - **Category Synchronization**: Automatically syncs categories from `config/settings.json` to `telegram_bot/settingsbot.json`
 - **Admin ID Management**: Safely handles Telegram admin ID input (numeric IDs, removes @ prefix if present)
-- **Windows EXE Build**: New `build_exe.bat` script for one-click bot compilation on Windows using PyInstaller
-- **PyInstaller Configuration**: Pre-configured `bot.spec` file with all dependencies and data files
-- **Bot Download System**: Creates zip archive of telegram_bot folder and provides `scp` command for download
-- **Automatic DATABASE_URL Fix**: `deploy_vps.sh` automatically replaces localhost with VPS IP before creating archive
-- **Comprehensive Documentation**: Added `README_BUILD.md` with step-by-step Windows build instructions
 
 ### October 26, 2025 - Custom Fonts and Logo Sizing
 - **Custom Fonts**: Added support for custom font files with configurable font-family and font-weight
