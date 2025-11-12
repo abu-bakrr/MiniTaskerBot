@@ -513,7 +513,7 @@ class ProductBot:
                 del self.temp_data[user_id]
     
     def run(self):
-        """Запускает бота в режиме polling"""
+        """Запускает бота в режиме polling с автоматическим переподключением"""
         print("🤖 Бот запущен и готов к работе...")
         print(f"👥 Авторизованных пользователей: {len(self.authorized_users)}")
         if self.authorized_users:
@@ -522,7 +522,24 @@ class ProductBot:
             print("   ⚠️ ВНИМАНИЕ: Список авторизованных пользователей пуст!")
             print("   Добавьте Telegram ID в файл settingsbot.json")
         
-        self.bot.infinity_polling()
+        retry_delay = 5
+        max_retry_delay = 60
+        
+        while True:
+            try:
+                print("🔄 Подключение к Telegram...")
+                self.bot.infinity_polling(timeout=60, long_polling_timeout=60)
+            except (ConnectionError, Exception) as e:
+                error_message = str(e)
+                print(f"❌ Потеряно соединение с Telegram: {error_message}")
+                print(f"⏳ Переподключение через {retry_delay} секунд...")
+                time.sleep(retry_delay)
+                
+                retry_delay = min(retry_delay * 2, max_retry_delay)
+                print("🔄 Попытка переподключения...")
+            except KeyboardInterrupt:
+                print("\n⛔ Бот остановлен пользователем")
+                break
 
 
 def main():

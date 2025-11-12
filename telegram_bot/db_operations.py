@@ -9,25 +9,48 @@ import time
 load_dotenv()
 
 
-def get_db_connection():
-    """Creates database connection"""
+def get_db_connection(max_retries=3, retry_delay=2):
+    """
+    Creates database connection with retry logic
+    
+    Args:
+        max_retries (int): Maximum number of connection attempts
+        retry_delay (int): Delay in seconds between retries
+        
+    Returns:
+        psycopg2.connection: Database connection
+        
+    Raises:
+        Exception: If connection fails after all retries
+    """
     database_url = os.getenv('DATABASE_URL')
     
-    if database_url:
-        if 'sslmode=' not in database_url:
-            database_url = database_url + ('&' if '?' in database_url else '?') + 'sslmode=require'
-        conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
-    else:
-        conn = psycopg2.connect(
-            host=os.getenv('PGHOST'),
-            port=os.getenv('PGPORT', '5432'),
-            user=os.getenv('PGUSER'),
-            password=os.getenv('PGPASSWORD'),
-            database=os.getenv('PGDATABASE'),
-            sslmode='require',
-            cursor_factory=RealDictCursor
-        )
-    return conn
+    for attempt in range(max_retries):
+        try:
+            if database_url:
+                if 'sslmode=' not in database_url:
+                    database_url = database_url + ('&' if '?' in database_url else '?') + 'sslmode=require'
+                conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
+            else:
+                conn = psycopg2.connect(
+                    host=os.getenv('PGHOST'),
+                    port=os.getenv('PGPORT', '5432'),
+                    user=os.getenv('PGUSER'),
+                    password=os.getenv('PGPASSWORD'),
+                    database=os.getenv('PGDATABASE'),
+                    sslmode='require',
+                    cursor_factory=RealDictCursor
+                )
+            print(f"✅ Подключение к БД успешно (попытка {attempt + 1})")
+            return conn
+        except (psycopg2.OperationalError, psycopg2.DatabaseError) as e:
+            print(f"❌ Ошибка подключения к БД (попытка {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                print(f"⏳ Повторная попытка через {retry_delay} секунд...")
+                time.sleep(retry_delay)
+            else:
+                print("❌ Не удалось подключиться к БД после всех попыток")
+                raise
 
 
 def get_categories_from_config():
