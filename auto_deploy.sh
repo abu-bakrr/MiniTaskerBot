@@ -203,7 +203,12 @@ sudo -u "$APP_USER" bash -c "cd $APP_DIR && source venv/bin/activate && pip inst
 
 # Инициализация таблиц базы данных
 print_step "Инициализация таблиц базы данных..."
-sudo -u "$APP_USER" bash -c "cd $APP_DIR && source venv/bin/activate && python3 init_tables.py" 2>/dev/null
+sudo -u "$APP_USER" bash <<EOF
+cd $APP_DIR
+source venv/bin/activate
+python3 init_tables.py
+EOF
+
 if [ $? -eq 0 ]; then
     print_step "Таблицы базы данных успешно созданы!"
 else

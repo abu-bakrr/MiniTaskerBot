@@ -17,19 +17,20 @@ def get_db_connection():
     database_url = os.getenv('DATABASE_URL')
     
     if database_url:
-        # Add sslmode=require for Neon database
-        if 'sslmode=' not in database_url:
-            database_url = database_url + ('&' if '?' in database_url else '?') + 'sslmode=require'
+        # Check if this is a remote Neon database (contains neon.tech)
+        # Local PostgreSQL on VPS doesn't need sslmode
+        if 'neon.tech' in database_url or 'amazonaws.com' in database_url:
+            if 'sslmode=' not in database_url:
+                database_url = database_url + ('&' if '?' in database_url else '?') + 'sslmode=require'
         conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
     else:
         # Build connection from individual PostgreSQL environment variables
         conn = psycopg2.connect(
-            host=os.getenv('PGHOST'),
+            host=os.getenv('PGHOST', 'localhost'),
             port=os.getenv('PGPORT', '5432'),
             user=os.getenv('PGUSER'),
             password=os.getenv('PGPASSWORD'),
             database=os.getenv('PGDATABASE'),
-            sslmode='require',
             cursor_factory=RealDictCursor
         )
     return conn

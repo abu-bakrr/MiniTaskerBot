@@ -2,6 +2,12 @@
 """
 Initialize database tables (run this once before starting the app)
 """
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 from app import init_db
 
 if __name__ == '__main__':
