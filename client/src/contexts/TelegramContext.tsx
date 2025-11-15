@@ -37,23 +37,12 @@ export function TelegramProvider({ children }: TelegramProviderProps) {
       try {
         let telegramUser: { id: number; username?: string; firstName?: string; lastName?: string } | null = null;
 
-        // Initialize Telegram WebApp
+        // Initialize Telegram WebApp if available
         if (window.Telegram?.WebApp) {
-          console.log('🔵 Telegram WebApp detected, initializing...');
           window.Telegram.WebApp.ready();
-          window.Telegram.WebApp.expand();
-          
-          // Enable closing confirmation
-          window.Telegram.WebApp.enableClosingConfirmation();
-          
-          console.log('🔍 Checking Telegram WebApp data:', {
-            platform: window.Telegram.WebApp.platform,
-            version: window.Telegram.WebApp.version,
-            initDataUnsafe: window.Telegram.WebApp.initDataUnsafe,
-          });
         }
 
-        // Method 1: Try standard Telegram WebApp API
+        // Method 1: Try standard Telegram WebApp API first
         if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
           const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
           telegramUser = {
@@ -62,35 +51,26 @@ export function TelegramProvider({ children }: TelegramProviderProps) {
             firstName: tgUser.first_name,
             lastName: tgUser.last_name,
           };
-          console.log('✅ Got Telegram user from WebApp.initDataUnsafe');
-        } 
-        // Method 2: Try retrieveLaunchParams as fallback
-        else {
+          console.log('🔵 Got Telegram data from WebApp.initDataUnsafe');
+        } else {
+          // Method 2: Fallback to retrieveLaunchParams
           try {
-            const launchParams = retrieveLaunchParams();
-            console.log('🔍 Launch params:', launchParams);
-            
-            if (launchParams?.initData) {
-              const userData = (launchParams.initData as any)?.user;
-              if (userData) {
-                telegramUser = {
-                  id: userData.id,
-                  username: userData.username,
-                  firstName: userData.firstName || userData.first_name,
-                  lastName: userData.lastName || userData.last_name,
-                };
-                console.log('✅ Got Telegram user from retrieveLaunchParams');
-              }
+            const { initData } = retrieveLaunchParams();
+            const userData = (initData as any)?.user;
+            if (userData) {
+              telegramUser = userData;
+              console.log('🔵 Got Telegram data from retrieveLaunchParams');
             }
           } catch (launchParamsError) {
-            console.warn('⚠️ retrieveLaunchParams failed:', launchParamsError);
+            console.log('⚠️ retrieveLaunchParams failed, not in Telegram:', launchParamsError);
           }
         }
         
         if (telegramUser) {
           setTelegramData(telegramUser);
           
-          console.log('🔵 TELEGRAM USER AUTHENTICATED:', {
+          console.log('🔵 TELEGRAM USER DATA:', {
+            source: 'Telegram Mini App',
             telegram_id: telegramUser.id,
             username: telegramUser.username,
             first_name: telegramUser.firstName,
@@ -111,16 +91,21 @@ export function TelegramProvider({ children }: TelegramProviderProps) {
 
           if (response.ok) {
             const data = await response.json();
-            console.log('✅ Backend authentication successful');
+            console.log('✅ AUTH SUCCESS (Telegram):', {
+              user_id: data.user.id,
+              telegram_id: data.user.telegram_id,
+              is_new_user: data.is_new,
+              username: data.user.username,
+            });
             setUser(data.user);
           } else {
             console.error('❌ Backend authentication failed:', await response.text());
           }
         } else {
-          console.warn('⚠️ No Telegram user data found. App may be opened outside Telegram.');
+          console.log('❌ Not running in Telegram mini app');
         }
       } catch (error) {
-        console.error('🔴 Telegram initialization error:', error);
+        console.error('🔴 Telegram init error:', error);
       } finally {
         setIsLoading(false);
       }
