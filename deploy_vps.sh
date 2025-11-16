@@ -135,6 +135,27 @@ done
 
 print_step "Данные Telegram бота сохранены"
 
+echo ""
+echo "💬 НАСТРОЙКА ИНФОРМАЦИОННОГО БОТА"
+echo ""
+echo "Дополнительный бот для ответов на команды (необязательно):"
+echo ""
+
+read -p "Установить информационный бот? (yes/no) [no]: " INSTALL_INFO_BOT
+INSTALL_INFO_BOT=${INSTALL_INFO_BOT:-no}
+
+if [ "$INSTALL_INFO_BOT" = "yes" ]; then
+    read -p "Введите токен информационного бота (от @BotFather): " INFO_BOT_TOKEN
+    while [ -z "$INFO_BOT_TOKEN" ]; do
+        print_error "Токен не может быть пустым!"
+        read -p "Введите токен информационного бота: " INFO_BOT_TOKEN
+    done
+    print_step "Информационный бот будет установлен"
+else
+    print_step "Информационный бот пропущен"
+fi
+echo ""
+
 # Установка пакетов
 print_step "Обновление системы и установка пакетов..."
 apt update && apt upgrade -y
@@ -451,6 +472,60 @@ else
     exit 1
 fi
 
+# Установка информационного бота (если выбрано)
+if [ "$INSTALL_INFO_BOT" = "yes" ]; then
+    print_step "Настройка информационного бота..."
+    
+    # Создание .env файла для информационного бота
+    cat > $APP_DIR/bot/.env <<EOF
+INFO_BOT_TOKEN=$INFO_BOT_TOKEN
+EOF
+    
+    chown $APP_USER:$APP_USER $APP_DIR/bot/.env
+    chmod 600 $APP_DIR/bot/.env
+    
+    # Установка зависимостей для информационного бота
+    sudo -u $APP_USER bash <<EOF
+cd $APP_DIR/bot
+python3 -m venv venv
+source venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+EOF
+    
+    # Создание systemd сервиса для информационного бота
+    cat > /etc/systemd/system/info-bot.service <<EOF
+[Unit]
+Description=Telegram Info Bot
+After=network.target
+
+[Service]
+Type=simple
+User=$APP_USER
+WorkingDirectory=$APP_DIR/bot
+Environment="PATH=$APP_DIR/bot/venv/bin"
+ExecStart=$APP_DIR/bot/venv/bin/python main.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    
+    # Запуск информационного бота
+    systemctl daemon-reload
+    systemctl enable info-bot
+    systemctl start info-bot
+    
+    # Проверка статуса
+    sleep 2
+    if systemctl is-active --quiet info-bot; then
+        print_step "Информационный бот успешно запущен!"
+    else
+        print_warning "Ошибка запуска информационного бота. Проверьте логи: journalctl -u info-bot -n 50"
+    fi
+fi
+
 # Настройка Nginx
 print_step "Настройка Nginx..."
 cat > /etc/nginx/sites-available/shop <<EOF
@@ -543,6 +618,15 @@ echo "  - Проверить статус: systemctl status shop-app"
 echo "  - Просмотреть логи: journalctl -u shop-app -f"
 echo "  - Перезапустить: systemctl restart shop-app"
 echo ""
+
+if [ "$INSTALL_INFO_BOT" = "yes" ]; then
+    echo "💬 Информационный бот:"
+    echo "  - Проверить статус: systemctl status info-bot"
+    echo "  - Просмотреть логи: journalctl -u info-bot -f"
+    echo "  - Перезапустить: systemctl restart info-bot"
+    echo ""
+fi
+
 echo "📝 Для обновления приложения используйте: ./update_vps.sh"
 echo ""
 
