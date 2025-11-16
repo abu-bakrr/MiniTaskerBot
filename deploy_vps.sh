@@ -600,6 +600,128 @@ EOF
     print_step "Тестовые данные загружены"
 fi
 
+# Настройка домена и SSL
+echo ""
+echo "=================================================="
+echo "🌐 НАСТРОЙКА ДОМЕНА И SSL"
+echo "=================================================="
+echo ""
+echo "Хотите настроить домен и SSL сертификат?"
+echo "⚠️  ВАЖНО: Перед настройкой убедитесь, что:"
+echo "   1. У вас есть домен в Hostinger"
+echo "   2. DNS A-запись указывает на IP этого сервера: $(hostname -I | awk '{print $1}')"
+echo "   3. DNS изменения уже вступили в силу (может занять до 24 часов)"
+echo ""
+
+read -p "Настроить домен и SSL? (yes/no) [no]: " SETUP_DOMAIN
+SETUP_DOMAIN=${SETUP_DOMAIN:-no}
+
+if [ "$SETUP_DOMAIN" = "yes" ]; then
+    echo ""
+    read -p "Введите ваш домен (например, example.com): " DOMAIN_NAME
+    while [ -z "$DOMAIN_NAME" ]; do
+        print_error "Домен не может быть пустым!"
+        read -p "Введите ваш домен: " DOMAIN_NAME
+    done
+    
+    echo ""
+    read -p "Добавить www поддомен? (yes/no) [yes]: " ADD_WWW
+    ADD_WWW=${ADD_WWW:-yes}
+    
+    if [ "$ADD_WWW" = "yes" ]; then
+        DOMAIN_LIST="$DOMAIN_NAME www.$DOMAIN_NAME"
+        NGINX_SERVER_NAME="$DOMAIN_NAME www.$DOMAIN_NAME"
+    else
+        DOMAIN_LIST="$DOMAIN_NAME"
+        NGINX_SERVER_NAME="$DOMAIN_NAME"
+    fi
+    
+    echo ""
+    read -p "Введите email для уведомлений Let's Encrypt: " SSL_EMAIL
+    while [ -z "$SSL_EMAIL" ]; do
+        print_error "Email не может быть пустым!"
+        read -p "Введите email: " SSL_EMAIL
+    done
+    
+    # Установка Certbot
+    print_step "Установка Certbot..."
+    apt install -y certbot python3-certbot-nginx > /dev/null 2>&1
+    
+    # Обновление Nginx конфигурации с доменом
+    print_step "Обновление Nginx конфигурации для домена $DOMAIN_NAME..."
+    cat > /etc/nginx/sites-available/shop <<EOF
+server {
+    listen 80;
+    server_name $NGINX_SERVER_NAME;
+
+    client_max_body_size 20M;
+
+    access_log /var/log/nginx/shop_access.log;
+    error_log /var/log/nginx/shop_error.log;
+
+    location /assets {
+        alias $APP_DIR/dist/public/assets;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location /config {
+        alias $APP_DIR/config;
+        expires 1h;
+        add_header Cache-Control "public";
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:$APP_PORT;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        
+        proxy_connect_timeout 120s;
+        proxy_send_timeout 120s;
+        proxy_read_timeout 120s;
+    }
+}
+EOF
+    
+    # Перезагрузка Nginx
+    nginx -t && systemctl reload nginx
+    
+    # Настройка SSL сертификата
+    print_step "Получение SSL сертификата от Let's Encrypt..."
+    echo ""
+    echo "Проверка DNS записей для $DOMAIN_LIST..."
+    echo ""
+    
+    certbot --nginx -d $DOMAIN_LIST --non-interactive --agree-tos --email $SSL_EMAIL --redirect
+    
+    if [ $? -eq 0 ]; then
+        print_step "✅ SSL сертификат успешно установлен!"
+        print_step "Автоматическое обновление сертификатов настроено"
+        
+        # Настройка автообновления
+        systemctl enable certbot.timer
+        systemctl start certbot.timer
+        
+        SITE_URL="https://$DOMAIN_NAME"
+    else
+        print_warning "Не удалось получить SSL сертификат"
+        print_warning "Возможные причины:"
+        print_warning "  1. DNS записи еще не вступили в силу"
+        print_warning "  2. Домен не указывает на IP сервера: $(hostname -I | awk '{print $1}')"
+        print_warning "  3. Порт 80 заблокирован"
+        echo ""
+        print_warning "Вы можете настроить SSL позже командой:"
+        echo "  certbot --nginx -d $DOMAIN_LIST"
+        
+        SITE_URL="http://$DOMAIN_NAME"
+    fi
+else
+    print_step "Настройка домена пропущена"
+    SITE_URL="http://$(hostname -I | awk '{print $1}')"
+fi
+
 # Финальная информация
 echo ""
 echo "=================================================="
@@ -607,11 +729,18 @@ echo -e "${GREEN}✅ Развертывание завершено успешн�
 echo "=================================================="
 echo ""
 echo "📋 Информация о развертывании:"
-echo "  - Приложение: http://$(hostname -I | awk '{print $1}')"
+echo "  - Приложение: $SITE_URL"
+echo "  - IP сервера: $(hostname -I | awk '{print $1}')"
 echo "  - Пользователь: $APP_USER"
 echo "  - Директория: $APP_DIR"
 echo "  - База данных: $DB_NAME"
 echo "  - Порт приложения: $APP_PORT"
+if [ "$SETUP_DOMAIN" = "yes" ]; then
+    echo "  - Домен: $DOMAIN_NAME"
+    if [ "$ADD_WWW" = "yes" ]; then
+        echo "  - WWW домен: www.$DOMAIN_NAME"
+    fi
+fi
 echo ""
 echo "🔧 Полезные команды:"
 echo "  - Проверить статус: systemctl status shop-app"
