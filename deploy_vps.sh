@@ -98,6 +98,21 @@ while [ -z "$TELEGRAM_ADMIN_ID" ]; do
     read -p "Введите ваш Telegram ID: " TELEGRAM_ADMIN_ID
 done
 
+echo ""
+echo "📬 НАСТРОЙКА УВЕДОМЛЕНИЙ О ЗАКАЗАХ"
+echo ""
+echo "Для получения уведомлений о новых заказах в Telegram:"
+echo ""
+
+read -p "Введите Chat ID для уведомлений о заказах (ваш Telegram ID или ID группы): " TELEGRAM_CHAT_ID
+while [ -z "$TELEGRAM_CHAT_ID" ]; do
+    print_error "Chat ID не может быть пустым!"
+    read -p "Введите Chat ID для уведомлений: " TELEGRAM_CHAT_ID
+done
+
+print_step "Настройки уведомлений сохранены"
+echo ""
+
 read -p "Введите Cloudinary Cloud Name: " CLOUDINARY_CLOUD_NAME
 while [ -z "$CLOUDINARY_CLOUD_NAME" ]; do
     print_error "Cloudinary Cloud Name не может быть пустым!"
@@ -282,6 +297,8 @@ cat > $APP_DIR/.env <<EOF
 DATABASE_URL=postgresql://$DB_USER:$DB_PASSWORD@localhost:5432/$DB_NAME
 PORT=$APP_PORT
 FLASK_ENV=production
+TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
+TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID
 EOF
 
 chown $APP_USER:$APP_USER $APP_DIR/.env
